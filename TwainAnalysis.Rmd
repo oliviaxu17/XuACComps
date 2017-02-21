@@ -47,6 +47,8 @@ connyankeetext <- scan(connyankeeURL, what = "character", sep = "\n")
 puddURL <- "http://www.gutenberg.org/files/102/102-0.txt"
 puddtext <- scan(puddURL, what = "character", sep = "\n")
 
+# End of Project Gutenberg’s Roughing It, by Mark Twain (Samuel Clemens)
+# End of the Project Gutenberg EBook of The Innocents Abroad
 # End of the Project Gutenberg EBook of Adventures of Huckleberry Finn,
 # End of the Project Gutenberg Ebook of Adventures of Tom Sawyer,
 # End of the Project Gutenberg EBook of A Connecticut Yankee in King Arthur’s
@@ -136,13 +138,51 @@ ggplot(data = allworksdata, aes(x = linenumber, y = ft)) +
         ggtitle(expression(paste("Sentiment in Twain's works "))) +
         theme(axis.title.x=element_blank()) +
         theme(axis.ticks.x=element_blank()) +
-        theme(axis.text.x=element_blank()) +
-annotate("text", size = 3, x = c(54, 82), 
-                 y = c(1, -1), 
-                 label = c("End of early works", "End of middle works")) +
-        annotate("segment", arrow = arrow(length = unit(0.03, "npc")),
-                 x = c(49,75), xend = c(49, 75),
-                 y = c(.9, -.9), 
-                 yend = c(.3, -.4))
+        theme(axis.text.x=element_blank()) 
+        #annotate("text", size = 3, x = c(54, 82), 
+                 #y = c(1, -1),
+                 #label = c("End of early works", "End of middle works")) 
+   #annotate("segment", arrow = arrow(length = unit(0.03, "npc")),x = c(49,75), 
+                #xend = c(49, 75),y = c(.9, -.9),yend = c(.3, -.4))
+```
+
+```{r, include=FALSE}
+library(stringr)
+library(plyr)
+library(tm)
+library(tm.plugin.mail)
+library(SnowballC)
+library(topicmodels)
+```
+
+```{r, warning = FALSE}
+# divide up all works by chapters
+
+# Function to divide texts up into chapters 
+chapters <- function(text, numbchap) {
+  chapterroman <- as.roman(1:numbchap)
+  chaptercounter <- 1
+  chapterlines <- 0
+  for (i in 1:length(text)) {
+    if (text[i] == paste("CHAPTER",chapterroman[chaptercounter], sep = " ")) {
+      #paste(chapterroman[chaptercounter], ".", sep = "")
+      chapterlines <- c(chapterlines, i)
+      chaptercounter <- chaptercounter + 1
+    }
+  }
+  chapterlines <- chapterlines[-1]
+  for (i in 1:length(chapterlines)) {
+    title <- paste("CCh", i, ".txt", sep ="")
+    j <- i + 1
+    write.table(text[chapterlines[i]:chapterlines[j]], title, sep = "\t")
+  } 
+}
+
+chapters(roughingittext, 79)
+chapters(innocentstext, 60)
+chapters(huckfinntext, 42)
+chapters(tomsawyertext, 35)
+chapters(connyankeetext, 44)
+chapters(puddtext, 21)
 ```
 
