@@ -15,7 +15,6 @@ output:
 ---
 
 ```{r, setup, include=FALSE}
-require(mosaic)   # Load additional packages here 
 library(mosaic) 
 library(XML)
 library(readr)
@@ -93,6 +92,13 @@ connyankeetext <- actualtext(connyankeetext, connyankeestartend)
 
 puddstartend <- findstart(puddtext)
 puddtext <- actualtext(puddtext, puddstartend)
+
+write.table(roughingittext, "roughingit.txt", sep = "\t")
+write.table(innocentstext, "innocents.txt", sep = "\t")
+write.table(tomsawyertext, "tomsawyer.txt", sep = "\t")
+write.table(huckfinntext, "huckfinn.txt", sep = "\t")
+write.table(connyankeetext, "connyankee.txt", sep = "\t")
+write.table(puddtext, "pudd.txt", sep = "\t")
 ```
 
 ```{r, warning = FALSE}

@@ -1,0 +1,14 @@
+<!-- The {.unnumbered} option here means that the introduction will be "Chapter 0." -->
+
+# Introduction {.unnumbered}
+
+### Mark Twain
+Samuel Langhorne Clemens, or better known under his pen name Mark Twain, was a famous American author known for writinf "The Great American Novel" \textit{The Adventures of Tom Sawyer}.  Born in 1835, he wrote many works in his lifetime up until his death in 1910.  Twain is a good choice for this text mining project because he wrote so much and because his works spanned across many years of his life and tackled so many different subjects.  
+
+### Previously, Katherine Mansfield
+I decided to do my extension on the works of Mark Twain because after tackling the short stories of Katherine Mansfield, I wanted to expand to works of much greater length.  Additionally, because Mansfield's works were so short, they did not lend themselves well to the Latent Dirichlet Allocation method (my expository review topic).
+
+### Text Mining with Twain
+I will be applying the same methods Andrew and I had previously used to textually analyze the works of Mansfield onto the works of Twain.  Because Twain's works are much longer, I decided to pick six of his works, two from each of his "eras" (early, middle, and late), that summed up each of his phases according to experts.  Then, using these six works, I will give an expository review of LDA for my peers. 
+
+
