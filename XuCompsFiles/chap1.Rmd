@@ -20,20 +20,8 @@ library(tm)
 ```
 
 ```{r, include = FALSE}
-# Reading in text files, see TwainAnalysis.Rmd for full data 
-# collection and cleaning process
-roughingitURL <- "http://www.gutenberg.org/files/3177/3177.txt"
-roughingittext <- scan(roughingitURL, what = "character", sep = "\n")
-innocentsURL <- "http://www.gutenberg.org/files/3176/3176-0.txt"
-innocentstext <- scan(innocentsURL, what = "character", sep = "\n")
-huckfinnURL <- "http://www.gutenberg.org/files/76/76-0.txt"
-huckfinntext <- scan(huckfinnURL, what = "character", sep = "\n")
 tomsawyerURL <- "http://www.gutenberg.org/files/74/74-0.txt"
 tomsawyertext <- scan(tomsawyerURL, what = "character", sep = "\n")
-connyankeeURL <- "http://www.gutenberg.org/files/86/86-0.txt"
-connyankeetext <- scan(connyankeeURL, what = "character", sep = "\n")
-puddURL <- "http://www.gutenberg.org/files/102/102-0.txt"
-puddtext <- scan(puddURL, what = "character", sep = "\n")
 ```
 
 As I stated in the **Introduction**, due to Twain having such a large and extensive body of work, it was necessary to pick and choose works that I wanted to use for my analysis.  A quick google search easily told me some of his most famous works, and so I tried to pick novels that he was famous for, while also making sure I had a selection from each phase of his writing career (early, middle, and end).  The works that ended up meeting those criteria are listed below.

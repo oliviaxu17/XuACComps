@@ -172,12 +172,12 @@ ggplot(data = allworksdata, aes(x = linenumber, y = ft)) +
         ggtitle(expression(paste("Sentiment in Twain's works "))) +
         theme(axis.title.x=element_blank()) +
         theme(axis.ticks.x=element_blank()) +
-        theme(axis.text.x=element_blank()) 
-        #annotate("text", size = 3, x = c(54, 82), 
-                 #y = c(1, -1),
-                 #label = c("End of early works", "End of middle works")) 
-   #annotate("segment", arrow = arrow(length = unit(0.03, "npc")),x = c(49,75), 
-                #xend = c(49, 75),y = c(.9, -.9),yend = c(.3, -.4))
+        theme(axis.text.x=element_blank()) +
+  ggplot2::annotate("text", size = 3, x = c(55, 82), 
+                 y = c(1, -1),
+                 label = c("Early works", "Middle works", "Late works")) + 
+  ggplot2::annotate("segment", arrow = arrow(length = unit(0.03, "npc")),x = c(51,77), 
+                xend = c(51, 77),y = c(.9, -.9),yend = c(.3, -.4))
 ```
 
 ```{r, include=FALSE}

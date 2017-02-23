@@ -47,8 +47,231 @@ Twain led a very exciting and inventive life.  When he was young, his family mov
 
 #### Sentiment Analysis
 
+```{r, include = FALSE}
+library(mosaic) 
+library(XML)
+library(readr)
+library(devtools)
+library(stringr)
+library(RCurl)
+library(syuzhet)
+library(tm)
+```
 
+```{r, include = FALSE}
+# importing texts
+roughingitURL <- "http://www.gutenberg.org/files/3177/3177.txt"
+roughingittext <- scan(roughingitURL, what = "character", sep = "\n")
+innocentsURL <- "http://www.gutenberg.org/files/3176/3176-0.txt"
+innocentstext <- scan(innocentsURL, what = "character", sep = "\n")
+huckfinnURL <- "http://www.gutenberg.org/files/76/76-0.txt"
+huckfinntext <- scan(huckfinnURL, what = "character", sep = "\n")
+tomsawyerURL <- "http://www.gutenberg.org/files/74/74-0.txt"
+tomsawyertext <- scan(tomsawyerURL, what = "character", sep = "\n")
+connyankeeURL <- "http://www.gutenberg.org/files/86/86-0.txt"
+connyankeetext <- scan(connyankeeURL, what = "character", sep = "\n")
+puddURL <- "http://www.gutenberg.org/files/102/102-0.txt"
+puddtext <- scan(puddURL, what = "character", sep = "\n")
+```
 
+```{r, include = FALSE}
+# cleaning roughing it text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I.") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "End of Project Gutenberg’s Roughing It, by Mark Twain (Samuel Clemens)") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
 
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# roughing it text
+roughstartend <- findstart(roughingittext)
+roughingittext <- actualtext(roughingittext, roughstartend)
+```
+
+```{r, include=FALSE}
+# cleaning innocents abroad text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I.") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "End of the Project Gutenberg EBook of The Innocents Abroad") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# innocents abroad text
+innocentstartend <- findstart(innocentstext)
+innocentstext <- actualtext(innocentstext, innocentstartend)
+```
+
+```{r, include=FALSE}
+# cleaning tom sawyer text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "CONCLUSION") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# tom sawyer text
+tomsawyerstartend <- findstart(tomsawyertext)
+tomsawyertext <- actualtext(tomsawyertext, tomsawyerstartend)
+tomsawyertext <- iconv(tomsawyertext,"WINDOWS-1252","UTF-8")
+```
+
+```{r, include = FALSE}
+# cleaning huckleberry finn text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I.") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "End of the Project Gutenberg EBook of Adventures of Huckleberry Finn,") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# huckleberry finn text
+huckfinnstartend <- findstart(huckfinntext)
+huckfinntext <- actualtext(huckfinntext, huckfinnstartend)
+```
+
+```{r, include = FALSE}
+# cleaning connecticut yankee text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "End of the Project Gutenberg EBook of A Connecticut Yankee in King Arthur’s") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# connecticut yankee text
+connyankeestartend <- findstart(connyankeetext)
+connyankeetext <- actualtext(connyankeetext, connyankeestartend)
+```
+
+```{r, include=FALSE}
+# cleaning pudd'n text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I.") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "and the creditors sold him down the river.") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# pudd'n text
+puddstartend <- findstart(puddtext)
+puddtext <- actualtext(puddtext, puddstartend)
+```
+
+```{r, include = FALSE}
+# sentiment across entire life
+early <- c(roughingittext, innocentstext)
+earlylen <- length(early)
+middle <- c(huckfinntext, tomsawyertext)
+midlen <- length(middle)
+late <- c(connyankeetext, puddtext)
+
+allworks <- c(early, middle, late)
+
+allworkssent <- get_sentiment(allworks, "syuzhet")
+allworkssenttrans <- as.numeric(get_transformed_values(allworkssent, 
+                                  low_pass_size = 3,
+                                  scale_vals = TRUE,
+                                  scale_range = FALSE))
+allworksdata <- data.frame(cbind(linenumber = seq_along(allworkssenttrans), ft = allworkssenttrans))
+```
+
+```{r, fig.align="center", cache=TRUE, warning=FALSE}
+ggplot(data = allworksdata, aes(x = linenumber, y = ft)) +
+        geom_bar(stat = "identity", alpha = 0.8, color = "midnightblue", fill = "midnightblue") +
+        theme_minimal() +
+        ylab("Transformed Sentiment Value") +
+        ggtitle(expression(paste("Sentiment in Twain's works "))) +
+        theme(axis.title.x=element_blank()) +
+        theme(axis.ticks.x=element_blank()) +
+        theme(axis.text.x=element_blank()) +
+  ggplot2::annotate("text", size = 3, x = c(20, 50, 80, 35, 55, 77, 90), 
+                 y = c(-2, -2, -2, -1, 1, 1.2, -1),
+                 label = c("Early works", "Middle works", "Late works", "Marriage", "Death of son", "Founded publishing\n company", "Bankruptcy")) + 
+  ggplot2::annotate("segment", arrow = arrow(length = unit(0.03, "npc")),x = c(35, 55, 77, 90), xend = c(35, 55, 77, 90),y = c(-.9, .9, 1, -.9),yend = c(-.1, .1, .2, -.1))
+```
+
+As expected, milestones in Twain's life match up with the sentiment throughout his works.  Appropriately, the sentiment reaches an all time high around the time he meets his wife, Olivia, and gets married.  The sentiment plummets after the death of their first child and never quite recovers to the original happiness.  The works end on a sad note when half his children have died and he's bankrupt.  
+
+#### Stylometric Analysis
 
 
