@@ -31,7 +31,7 @@ Now that I've gone through \textit{The Adventures of Tom Sawyer}, I wanted to ta
 
 Twain led a very exciting and inventive life.  When he was young, his family moved to the city of Hannibal, MO.  Hannibal was a frequent stop for steam boats, and it came to be quite the inspiration for Twain later in his works.  Twain was educated at a local private school until he droppped out to become a printer's apprentice, where he discovered his love for writing.  Later in his life, while living in California, Twain met his future wife, Olivia Langdon.  They had one son and three daughters together, only of which one of them would make it to adulthood.  Twain frequently invested in new inventions, and towards the end of his career, he was broke from poor investments.  Below is a timeline of Twain's life in picture format.  
 
-```{r fig.width=1, fig.height=4,echo=FALSE}
+```{r, fig.width=6, fig.height=3,echo=FALSE}
 library(png)
 library(grid)
 img <- readPNG("twaintimeline.png")
@@ -269,7 +269,7 @@ As expected, milestones in Twain's life match up with the sentiment throughout h
 
 #### Stylometric Analysis
 
-```{r}
+```{r, include = FALSE}
 library(katherinemansfieldr)
 # sentence length
 sentlen <- function(sentences) {
@@ -295,8 +295,7 @@ latesenlen <- sentlen(lateSent)
 latesendata <- as.data.frame(cbind(latesenlen, c(1:length(latesenlen))))
 ```
 
-
-```{r}
+```{r, include = FALSE}
 library(ggplot2)
 # early sentence length
 earlysenlenplot <- ggplot(earlysendata, 
@@ -312,7 +311,7 @@ earlysenlenplot <- ggplot(earlysendata,
   theme(plot.title = element_text(size = 12))
 ```
 
-```{r}
+```{r, include=FALSE}
 # middle sentence length
 middlesenlenplot <- ggplot(middlesendata, 
                     aes(x = V2, y = middlesenlen)) + 
@@ -327,7 +326,7 @@ middlesenlenplot <- ggplot(middlesendata,
   theme(plot.title = element_text(size = 12))
 ```
 
-```{r}
+```{r, include = FALSE}
 # late sentence length
 latesenlenplot <- ggplot(latesendata, 
                     aes(x = V2, y = latesenlen)) + 
@@ -341,5 +340,144 @@ latesenlenplot <- ggplot(latesendata,
   theme(axis.title.x = element_text(size = 9)) + 
   theme(plot.title = element_text(size = 12))
 ```
+
+```{r, include=FALSE}
+# token length
+tokenlen <- function(token) {
+  toklen <- 0
+  for (i in 1:length(token)) {
+    tokenlen <- nchar(token[i])
+    toklen <- c(toklen, tokenlen)
+  }
+  toklen <- toklen[-1]
+  return(toklen)
+}
+
+earlyToken <- extract_token(early)
+earlytokenlength <- tokenlen(earlyToken)
+earlytokendata <- as.data.frame(cbind(earlytokenlength, c(1:length(earlytokenlength))))
+
+middleToken <- extract_token(middle)
+middletokenlength <- tokenlen(middleToken)
+middletokendata <- as.data.frame(cbind(middletokenlength, c(1:length(middletokenlength))))
+
+lateToken <- extract_token(late)
+latetokenlength <- tokenlen(lateToken)
+latetokendata <- as.data.frame(cbind(latetokenlength, c(1:length(latetokenlength))))
+```
+
+```{r, include = FALSE}
+# early token length
+earlytokenplot <- ggplot(earlytokendata, 
+                    aes(x = V2, y = earlytokenlength)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(earlytokendata$earlytokenlength), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Token Length \n (# of characters)") + 
+  xlab("Line Number") +
+  ggtitle("Average Token Length \n for Early Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, include = FALSE}
+# middle token length
+middletokenplot <- ggplot(middletokendata, 
+                    aes(x = V2, y = middletokenlength)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(middletokendata$middletokenlength), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Token Length \n (# of characters)") + 
+  xlab("Line Number") +
+  ggtitle("Average Token Length \n for Middle Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, include= FALSE}
+# late token length
+latetokenplot <- ggplot(latetokendata, 
+                    aes(x = V2, y = latetokenlength)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(latetokendata$latetokenlength), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Token Length \n (# of characters)") + 
+  xlab("Line Number") +
+  ggtitle("Average Token Length \n for Late Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, include = FALSE}
+# early quotation
+earlypunc <- freq_punct_line(early, "“")
+
+earlyquoteplot <- ggplot(earlypunc, 
+                    aes(x = line_index, y = left_quote)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(earlypunc$left_quote), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Number of\n Speaking Lines") + 
+  xlab("Line Number") +
+  ggtitle("Average Number of Speaking\n Lines for Early Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, include = FALSE}
+# middle quotation
+middlepunc <- freq_punct_line(middle, "“")
+
+middlequoteplot <- ggplot(middlepunc, 
+                    aes(x = line_index, y = left_quote)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(middlepunc$left_quote), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Number of\n Speaking Lines") + 
+  xlab("Line Number") +
+  ggtitle("Average Number of Speaking\n Lines for Middle Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, include = FALSE}
+# late quotations
+latepunc <- freq_punct_line(late, "“")
+
+latequoteplot <- ggplot(latepunc, 
+                    aes(x = line_index, y = left_quote)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(latepunc$left_quote), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Number of\n Speaking Lines") + 
+  xlab("Line Number") +
+  ggtitle("Average Number of Speaking\n Lines for Late Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+As we can see from the plots below, general trends between early, middle, and late works do not seem to differ drastically.  One difference to note among sentence length is that Twain's earlier works seem to have longer sentences in general, which isn't surprising because his earlier works described landscapes and nature scenery.  His later works had a larger variety in sentence length, which could be due to becoming a more critical and experienced writer over the years.  
+Among token length, the general trend across is that tokens are longer as the stories progress.  The earlier works again have longer tokens than middle or late works, and that could be due to the emphasis on nature and scenery in those works.
+There are more speaking lines in the middle works than early or late works.  Again this isn't surprising because of the content in those works.  The trends are different between the three phases, speaking lines increase as the novels progress in early and late works, but decrease for the middle works.  
+Because there were only two works used for each period, this analysis is of course limited because I didn't analyze Twain's full body of work for each period.  However, I did pick his most notable pieces to analyze, so these graphs could be able to say something about the general essence of his writing from those periods.  
+
+
+```{r, echo = FALSE, warning=FALSE}
+library(cowplot)
+library(ggplot2)
+plot_grid(earlysenlenplot, middlesenlenplot, latesenlenplot, 
+          earlytokenplot, middletokenplot, latetokenplot,
+          earlyquoteplot, middlequoteplot, latequoteplot,
+          nrow = 3, ncol = 3)
+```
+
+
+
 
 

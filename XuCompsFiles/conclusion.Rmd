@@ -3,32 +3,714 @@ output: pdf_document
 ---
 
 # Conclusion {.unnumbered}
-  \setcounter{chapter}{4}
-	\setcounter{section}{0}
 
-If we don't want Conclusion to have a chapter number next to it, we can add the `{.unnumbered}` attribute.  This has an unintended consequence of the sections being labeled as 3.6 for example though instead of 4.1.  The \LaTeX\ commands immediately following the Conclusion declaration get things back on track.
+Mark Twain wrote a full body of works that are an excellent source of data for statistics practice and text mining.  In this project, I've explored different methods of stylometric analysis and explored sentiment analysis using the `szyuzhet` package.  Twain's writing style and content certainly changed over his life, and through these project, we were able to see how they changed and postulate reasons for these changes.  Hopefully, future students will be able to use this project as a guide to learning text mining.
 
-#### More info
-
-And here's some other random info: the first paragraph after a chapter title or section head _shouldn't be_ indented, because indents are to tell the reader that you're starting a new paragraph. Since that's obvious after a chapter or section title, proper typesetting doesn't add an indent there.
-
-<!--
-If you feel it necessary to include an appendix, it goes here.
--->
 
 \appendix
 
-# The First Appendix
+# Appendix
 
-This first appendix includes all of the R chunks of code that were hidden throughout the document (using the `include = FALSE` chunk tag) to help with readibility and/or setup.
+## Chapter 1
 
-#### In the main Rmd file:
+### Sentiment Analysis 
 
-```{r ref.label = 'include_packages', results = 'hide', echo = TRUE}
+```{r, eval = FALSE}
+# packages needed
+library(mosaic) 
+library(XML)
+library(readr)
+library(devtools)
+library(stringr)
+library(RCurl)
+library(syuzhet)
+library(tm)
 ```
 
-#### In [](#ref_labels):
-
-```{r ref.label = 'include_packages_2', results = 'hide', echo = TRUE}
+```{r, eval = FALSE}
+# tom sawyer text website
+tomsawyerURL <- "http://www.gutenberg.org/files/74/74-0.txt"
+tomsawyertext <- scan(tomsawyerURL, what = "character", sep = "\n")
 ```
+
+```{r, eval = FALSE}
+# cleaning tom sawyer text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "CONCLUSION") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# tom sawyer text
+tomsawyerstartend <- findstart(tomsawyertext)
+tomsawyertext <- actualtext(tomsawyertext, tomsawyerstartend)
+tomsawyertext <- iconv(tomsawyertext,"WINDOWS-1252","UTF-8")
+```
+
+```{r, eval=FALSE}
+#sentiment data for tom sawyer
+tomsent <- get_sentiment(tomsawyertext, "syuzhet")
+tomsenttrans <- as.numeric(get_transformed_values(tomsent, 
+                                  low_pass_size = 3,
+                                  scale_vals = TRUE,
+                                  scale_range = FALSE))
+tomsentdata <- data.frame(cbind(linenumber = seq_along(tomsenttrans), ft = tomsenttrans))
+```
+
+```{r, eval = FALSE}
+# tom sawyer sentiment graph with Fourier transform
+ggplot(data = tomsentdata, aes(x = linenumber, y = ft)) +
+        geom_bar(stat = "identity", alpha = 0.8, color = "midnightblue", fill = "midnightblue") +
+        theme_minimal() +
+        ylab("Transformed Sentiment Value") +
+        ggtitle(expression(paste("Sentiment in ", italic("The Adventures of Tom Sawyer")))) +
+        theme(axis.title.x=element_blank()) +
+        theme(axis.ticks.x=element_blank()) +
+        theme(axis.text.x=element_blank()) +
+ggplot2::annotate("text", size = 3, x = c(8, 18, 22, 38, 71, 85), 
+                 y = c(2.3, -1.3, 1.5, .9, 1.1, -1.1), 
+                 label = c("Meets Amy Lawrence", "Falls in love\n with Becky",
+                           "Witness graveyard\n murder", "Escape to island",
+                           "Trial of Potter and Injun Joe", "Huck saves widow")) +
+        ggplot2::annotate("segment", arrow = arrow(length = unit(0.03, "npc")),
+                 x = c(8, 18, 22, 38, 71, 87), xend = c(8, 18, 22, 38, 71, 87),
+                 y = c(2.2, -1, 1.2, .8, 1, -1), 
+                 yend = c(1.7, -.1 , 0.3, .1, .3, -.2))
+```
+
+### Stylometric Analysis
+
+```{r, eval = FALSE}
+# installing katherinemansfield package
+devtools::install_github("Amherst-Statistics/katherinemansfieldr")
+library(katherinemansfieldr)
+```
+
+```{r, eval= FALSE}
+# finding sentence length in Tom Sawyer
+sentlen <- function(sentences) {
+  senlen <- 0
+  for (i in 1:length(sentences)) {
+    sentlen <- sapply(gregexpr("\\W+", sentences[i]), length) + 1
+    senlen <- c(senlen, sentlen)
+  }
+  senlen <- senlen[-1]
+  return(senlen)
+}
+
+tomSentences <- extract_sentences(tomsawyertext)
+tomsenlen <- sentlen(tomSentences)
+```
+
+```{r, eval= FALSE}
+# plotting tom sawyer sentence length
+data <- as.data.frame(cbind(tomsenlen, c(1:length(tomsenlen))))
+ggplot(data, aes(x = V2, y = tomsenlen)) + geom_smooth() + 
+  geom_hline(yintercept = mean(data$tomsenlen), color = "red", linetype = "dashed") + ylab("Sentence Length") + xlab("Sentence number") + ggtitle("Sentence Length across Tom Sawyer")
+```
+
+```{r, eval= FALSE}
+# finding token length in tom sawyer
+tomToken <- extract_token(tomsawyertext)
+
+tokenlen <- function(token) {
+  toklen <- 0
+  for (i in 1:length(token)) {
+    tokenlen <- nchar(token[i])
+    toklen <- c(toklen, tokenlen)
+  }
+  toklen <- toklen[-1]
+  return(toklen)
+}
+
+tokenlength <- tokenlen(tomToken)
+```
+
+```{r, eval=FALSE}
+# plotting token length in tom sawyer
+data <- as.data.frame(cbind(tokenlength, c(1:length(tokenlength))))
+ggplot(data, aes(x = V2, y = tokenlength)) + geom_smooth() + 
+  geom_hline(yintercept = mean(data$tokenlength), color = "red", linetype = "dashed") + ylab("Token Length") + xlab("Token number") + ggtitle("Token Length across Tom Sawyer")
+```
+
+## Chapter 2
+
+```{r, eval=FALSE}
+# Mark Twain life timeline
+library(png)
+library(grid)
+img <- readPNG("twaintimeline.png")
+grid.raster(img)
+```
+
+### Twain's life as seen through his works
+
+#### Sentiment Analysis
+
+```{r, eval = FALSE}
+# packages needed
+library(mosaic) 
+library(XML)
+library(readr)
+library(devtools)
+library(stringr)
+library(RCurl)
+library(syuzhet)
+library(tm)
+```
+
+```{r, eval = FALSE}
+# importing texts
+roughingitURL <- "http://www.gutenberg.org/files/3177/3177.txt"
+roughingittext <- scan(roughingitURL, what = "character", sep = "\n")
+innocentsURL <- "http://www.gutenberg.org/files/3176/3176-0.txt"
+innocentstext <- scan(innocentsURL, what = "character", sep = "\n")
+huckfinnURL <- "http://www.gutenberg.org/files/76/76-0.txt"
+huckfinntext <- scan(huckfinnURL, what = "character", sep = "\n")
+tomsawyerURL <- "http://www.gutenberg.org/files/74/74-0.txt"
+tomsawyertext <- scan(tomsawyerURL, what = "character", sep = "\n")
+connyankeeURL <- "http://www.gutenberg.org/files/86/86-0.txt"
+connyankeetext <- scan(connyankeeURL, what = "character", sep = "\n")
+puddURL <- "http://www.gutenberg.org/files/102/102-0.txt"
+puddtext <- scan(puddURL, what = "character", sep = "\n")
+```
+
+```{r, eval = FALSE}
+# cleaning roughing it text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I.") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "End of Project Gutenberg’s Roughing It, by Mark Twain (Samuel Clemens)") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# roughing it text
+roughstartend <- findstart(roughingittext)
+roughingittext <- actualtext(roughingittext, roughstartend)
+```
+
+```{r, eval=FALSE}
+# cleaning innocents abroad text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I.") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "End of the Project Gutenberg EBook of The Innocents Abroad") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# innocents abroad text
+innocentstartend <- findstart(innocentstext)
+innocentstext <- actualtext(innocentstext, innocentstartend)
+```
+
+```{r, eval=FALSE}
+# cleaning tom sawyer text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "CONCLUSION") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# tom sawyer text
+tomsawyerstartend <- findstart(tomsawyertext)
+tomsawyertext <- actualtext(tomsawyertext, tomsawyerstartend)
+tomsawyertext <- iconv(tomsawyertext,"WINDOWS-1252","UTF-8")
+```
+
+```{r, eval = FALSE}
+# cleaning huckleberry finn text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I.") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "End of the Project Gutenberg EBook of Adventures of Huckleberry Finn,") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# huckleberry finn text
+huckfinnstartend <- findstart(huckfinntext)
+huckfinntext <- actualtext(huckfinntext, huckfinnstartend)
+```
+
+```{r, eval = FALSE}
+# cleaning connecticut yankee text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "End of the Project Gutenberg EBook of A Connecticut Yankee in King Arthur’s") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# connecticut yankee text
+connyankeestartend <- findstart(connyankeetext)
+connyankeetext <- actualtext(connyankeetext, connyankeestartend)
+```
+
+```{r, eval=FALSE}
+# cleaning pudd'n text
+findstart <- function(text){ 
+  startend <- 0
+  for (i in 1:length(text)){
+    if (text[i] == "CHAPTER I.") {
+      startend <- i
+    }
+  }
+  for (j in 50:length(text)){
+    if (text[j] == "and the creditors sold him down the river.") {
+      startend <- c(startend, j)
+      return(startend)
+    }
+  }
+} 
+
+actualtext <- function(text, startend){
+  realtext <- text[startend[1]:startend[2]]
+  return (realtext)
+}
+
+# pudd'n text
+puddstartend <- findstart(puddtext)
+puddtext <- actualtext(puddtext, puddstartend)
+```
+
+```{r, eval = FALSE}
+# sentiment across entire life
+early <- c(roughingittext, innocentstext)
+earlylen <- length(early)
+middle <- c(huckfinntext, tomsawyertext)
+midlen <- length(middle)
+late <- c(connyankeetext, puddtext)
+
+allworks <- c(early, middle, late)
+
+allworkssent <- get_sentiment(allworks, "syuzhet")
+allworkssenttrans <- as.numeric(get_transformed_values(allworkssent, 
+                                  low_pass_size = 3,
+                                  scale_vals = TRUE,
+                                  scale_range = FALSE))
+allworksdata <- data.frame(cbind(linenumber = seq_along(allworkssenttrans), ft = allworkssenttrans))
+```
+
+```{r, eval = FALSE}
+# sentiment across all works with Fourier transform
+ggplot(data = allworksdata, aes(x = linenumber, y = ft)) +
+        geom_bar(stat = "identity", alpha = 0.8, color = "midnightblue", fill = "midnightblue") +
+        theme_minimal() +
+        ylab("Transformed Sentiment Value") +
+        ggtitle(expression(paste("Sentiment in Twain's works "))) +
+        theme(axis.title.x=element_blank()) +
+        theme(axis.ticks.x=element_blank()) +
+        theme(axis.text.x=element_blank()) +
+  ggplot2::annotate("text", size = 3, x = c(20, 50, 80, 35, 55, 77, 90), 
+                 y = c(-2, -2, -2, -1, 1, 1.2, -1),
+                 label = c("Early works", "Middle works", "Late works", "Marriage", "Death of son", "Founded publishing\n company", "Bankruptcy")) + 
+  ggplot2::annotate("segment", arrow = arrow(length = unit(0.03, "npc")),x = c(35, 55, 77, 90), xend = c(35, 55, 77, 90),y = c(-.9, .9, 1, -.9),yend = c(-.1, .1, .2, -.1))
+```
+
+#### Stylometric Analysis
+
+```{r, eval = FALSE}
+# packages needed
+library(katherinemansfieldr)
+# sentence length function
+sentlen <- function(sentences) {
+  senlen <- 0
+  for (i in 1:length(sentences)) {
+    sentlen <- sapply(gregexpr("\\W+", sentences[i]), length) + 1
+    senlen <- c(senlen, sentlen)
+  }
+  senlen <- senlen[-1]
+  return(senlen)
+}
+
+# finding sentence length in early, middle, late works
+earlySent <- extract_sentences(early)
+earlysenlen <- sentlen(earlySent)
+earlysendata <- as.data.frame(cbind(earlysenlen, c(1:length(earlysenlen))))
+
+middleSent <- extract_sentences(middle)
+middlesenlen <- sentlen(middleSent)
+middlesendata <- as.data.frame(cbind(middlesenlen, c(1:length(middlesenlen))))
+
+lateSent <- extract_sentences(late)
+latesenlen <- sentlen(lateSent)
+latesendata <- as.data.frame(cbind(latesenlen, c(1:length(latesenlen))))
+```
+
+```{r, eval = FALSE}
+# packages needed
+library(ggplot2)
+# early sentence length plot
+earlysenlenplot <- ggplot(earlysendata, 
+                    aes(x = V2, y = earlysenlen)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(earlysendata$earlysenlen), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Sentence Length \n (# of words)") + 
+  xlab("Line Number") +
+  ggtitle("Average Sentence Length \n for Early Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, eval=FALSE}
+# middle sentence length plot
+middlesenlenplot <- ggplot(middlesendata, 
+                    aes(x = V2, y = middlesenlen)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(middlesendata$middlesenlen), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Sentence Length \n (# of words)") + 
+  xlab("Line Number") +
+  ggtitle("Average Sentence Length \n for Middle Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, eval = FALSE}
+# late sentence length plot
+latesenlenplot <- ggplot(latesendata, 
+                    aes(x = V2, y = latesenlen)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(latesendata$latesenlen), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Sentence Length \n (# of words)") + 
+  xlab("Line Number") +
+  ggtitle("Average Sentence Length \n for Late Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, eval=FALSE}
+# token length function
+tokenlen <- function(token) {
+  toklen <- 0
+  for (i in 1:length(token)) {
+    tokenlen <- nchar(token[i])
+    toklen <- c(toklen, tokenlen)
+  }
+  toklen <- toklen[-1]
+  return(toklen)
+}
+
+# token length in early, middle, late works
+earlyToken <- extract_token(early)
+earlytokenlength <- tokenlen(earlyToken)
+earlytokendata <- as.data.frame(cbind(earlytokenlength, c(1:length(earlytokenlength))))
+
+middleToken <- extract_token(middle)
+middletokenlength <- tokenlen(middleToken)
+middletokendata <- as.data.frame(cbind(middletokenlength, c(1:length(middletokenlength))))
+
+lateToken <- extract_token(late)
+latetokenlength <- tokenlen(lateToken)
+latetokendata <- as.data.frame(cbind(latetokenlength, c(1:length(latetokenlength))))
+```
+
+```{r, eval = FALSE}
+# early token length plot
+earlytokenplot <- ggplot(earlytokendata, 
+                    aes(x = V2, y = earlytokenlength)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(earlytokendata$earlytokenlength), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Token Length \n (# of characters)") + 
+  xlab("Line Number") +
+  ggtitle("Average Token Length \n for Early Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, eval = FALSE}
+# middle token length plot
+middletokenplot <- ggplot(middletokendata, 
+                    aes(x = V2, y = middletokenlength)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(middletokendata$middletokenlength), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Token Length \n (# of characters)") + 
+  xlab("Line Number") +
+  ggtitle("Average Token Length \n for Middle Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, eval= FALSE}
+# late token length plot
+latetokenplot <- ggplot(latetokendata, 
+                    aes(x = V2, y = latetokenlength)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(latetokendata$latetokenlength), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Token Length \n (# of characters)") + 
+  xlab("Line Number") +
+  ggtitle("Average Token Length \n for Late Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, eval = FALSE}
+# early quotation plot
+earlypunc <- freq_punct_line(early, "“")
+
+earlyquoteplot <- ggplot(earlypunc, 
+                    aes(x = line_index, y = left_quote)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(earlypunc$left_quote), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Number of\n Speaking Lines") + 
+  xlab("Line Number") +
+  ggtitle("Average Number of Speaking\n Lines for Early Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, eval = FALSE}
+# middle quotation plot
+middlepunc <- freq_punct_line(middle, "“")
+
+middlequoteplot <- ggplot(middlepunc, 
+                    aes(x = line_index, y = left_quote)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(middlepunc$left_quote), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Number of\n Speaking Lines") + 
+  xlab("Line Number") +
+  ggtitle("Average Number of Speaking\n Lines for Middle Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, eval = FALSE}
+# late quotations plot
+latepunc <- freq_punct_line(late, "“")
+
+latequoteplot <- ggplot(latepunc, 
+                    aes(x = line_index, y = left_quote)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(latepunc$left_quote), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Number of\n Speaking Lines") + 
+  xlab("Line Number") +
+  ggtitle("Average Number of Speaking\n Lines for Late Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r, eval = FALSE}
+# packages needed
+library(cowplot)
+library(ggplot2)
+# code to graph all 9 plots together
+plot_grid(earlysenlenplot, middlesenlenplot, latesenlenplot, 
+          earlytokenplot, middletokenplot, latetokenplot,
+          earlyquoteplot, middlequoteplot, latequoteplot,
+          nrow = 3, ncol = 3)
+```
+
+## Chapter 3
+
+### Twain and LDA
+
+```{r, eval = FALSE}
+# packages needed
+library(stringr)
+library(plyr)
+library(tm)
+library(tm.plugin.mail)
+library(SnowballC)
+library(topicmodels)
+```
+
+```{r, eval = FALSE}
+# creating Corpus of Twain texts
+twaincorpus <- Corpus(DirSource("/home/class17/sxu17/XuACComps/TwainTexts"))
+
+# stop words list
+extendedstopwords=c("a","about","above","across","after","MIME Version","forwarded","again","against","all","almost","alone","along","already","also","although","always","am","among","an","and","another","any","anybody","anyone","anything","anywhere","are","area","areas","aren't","around","as","ask","asked","asking","asks","at","away","b","back","backed","backing","backs","be","became","because","become","becomes","been","before","began","behind","being","beings","below","best","better","between","big","both","but","by","c","came","can","cannot","can't","case","cases","certain","certainly","clear","clearly","come","could","couldn't","d","did","didn't","differ","different","differently","do","does","doesn't","doing","done","don't","down","downed","downing","downs","during","e","each","early","either","end","ended","ending","ends","enough","even","evenly","ever","every","everybody","everyone","everything","everywhere","f","face","faces","fact","facts","far","felt","few","find","finds","first","for","four","from","full","fully","further","furthered","furthering","furthers","g","gave","general","generally","get","gets","give","given","gives","go","going","good","goods","got","great","greater","greatest","group","grouped","grouping","groups","h","had","hadn't","has","hasn't","have","haven't","having","he","he'd","he'll","her","here","here's","hers","herself","he's","high","higher","highest","him","himself","his","how","however","how's","i","i'd","if","i'll","i'm","important","in","interest","interested","interesting","interests","into","is","isn't","it","its","it's","itself","i've","j","just","k","keep","keeps","kind","knew","know","known","knows","l","large","largely","last","later","latest","least","less","let","lets","let's","like","likely","long","longer","longest","m","made","make","making","man","many","may","me","member","members","men","might","more","most","mostly","mr","mrs","much","must","mustn't","my","myself","n","necessary","need","needed","needing","needs","never","new","newer","newest","next","no","nobody","non","noone","nor","not","nothing","now","nowhere","number","numbers","o","of","off","often","old","older","oldest","on","once","one","only","open","opened","opening","opens","or","order","ordered","ordering","orders","other","others","ought","our","ours","ourselves","out","over","own","p","part","parted","parting","parts","per","perhaps","place","places","point","pointed","pointing","points","possible","present","presented","presenting","presents","problem","problems","put","puts","q","quite","r","rather","really","right","room","rooms","s","said","same","saw","say","says","second","seconds","see","seem","seemed","seeming","seems","sees","several","shall","shan't","she","she'd","she'll","she's","should","shouldn't","show","showed","showing","shows","side","sides","since","small","smaller","smallest","so","some","somebody","someone","something","somewhere","state","states","still","such","sure","t","take","taken","than","that","that's","the","their","theirs","them","themselves","then","there","therefore","there's","these","they","they'd","they'll","they're","they've","thing","things","think","thinks","this","those","though","thought","thoughts","three","through","thus","to","today","together","too","took","toward","turn","turned","turning","turns","two","u","under","until","up","upon","us","use","used","uses","v","very","w","want","wanted","wanting","wants","was","wasn't","way","ways","we","we'd","well","we'll","wells","went","were","we're","weren't","we've","what","what's","when","when's","where","where's","whether","which","while","who","whole","whom","who's","whose","why","why's","will","with","within","without","won't","work","worked","working","works","would","wouldn't","x","y","year","years","yes","yet","you","you'd","you'll","young","younger","youngest","your","you're","yours","yourself","yourselves","you've","z", "littl", "tom", "warnt", "hundr", "look", "nigger", "aint", "dont", "peopl", "chapter", "wilson", "didnt", "wouldnt", "couldnt", "peopl", "beauti", "pictur", "reckon", "time")
+```
+
+```{r, eval = FALSE}
+# cleaning Corpus
+dtm.control = list(
+  tolower = T,
+  removePunctuation = T,
+  removeNumbers = T,
+  stopwords = c(stopwords("english"),extendedstopwords),
+  stemming = T,
+  wordLengths = c(3,Inf),
+  weighting = weightTf)
+
+dtm = DocumentTermMatrix(twaincorpus, control=dtm.control)
+dtm = removeSparseTerms(dtm,0.999)
+dtm = dtm[rowSums(as.matrix(dtm))>0,]
+```
+
+```{r, eval=FALSE}
+# results from LDA
+k = 4
+lda.model = LDA(dtm, k)
+terms(lda.model,20)
+```
+
+```{r, eval=FALSE}
+# code to see how closely certain chapters match with each topic
+twain.topics = posterior(lda.model, dtm)$topics
+df.twain.topics = as.data.frame(twain.topics)
+df.twain.topics = cbind(email=as.character(rownames(df.twain.topics)), 
+                         df.twain.topics, stringsAsFactors=F)
+```
+
+```{r, eval=FALSE}
+# finding chapters that are highly correlated to topic 1
+sample(which(df.twain.topics$"1" > .95), 10)
+topic1 <- twaincorpus[[72]]
+topic1$content[1:10]
+```
+
+```{r, eval = FALSE}
+# displaying part of chapter that is high on topic 1
+library(png)
+library(grid)
+img <- readPNG("huckfinn35.png")
+grid.raster(img)
+```
+
+```{r, eval = FALSE}
+# finding chapters that are highly correlated to topic 2
+sample(which(df.twain.topics$"2" > .95), 10)
+topic2 <- twaincorpus[[10]]
+topic2$content[1:10]
+```
+
+```{r, eval=FALSE}
+# displaying part of chapter that is high on topic 2
+img <- readPNG("connyankee.png")
+grid.raster(img)
+```
+
+```{r, eval = FALSE}
+# finding chapters highly correlated to chapter 3
+sample(which(df.twain.topics$"3" > .95), 10)
+topic3 <- twaincorpus[[208]]
+topic3$content[1:10]
+```
+
+```{r, eval=FALSE}
+# dispalying part of chapter that is high on topic 3
+img <- readPNG("roughing.png")
+grid.raster(img)
+```
+
+```{r, eval = FALSE}
+# finding chapters highly correlated to chapter 4
+sample(which(df.twain.topics$"4" > .95), 10)
+topic4 <- twaincorpus[[132]]
+topic4$content[1:10]
+```
+
+```{r, eval=FALSE}
+# displaying part of chapter that is high on topic 4
+img <- readPNG("innocents.png")
+grid.raster(img)
+```
+
+# Chapter 4
+
+### About
+
+```{r, eval=FALSE}
+# load marktwainr package code
+devtools::install_github("oliviaxu17/marktwainr")
+library(marktwainr)
+```
+
 
