@@ -1,0 +1,16 @@
+---
+output: 
+  pdf_document: 
+    latex_engine: xelatex
+---
+
+# marktwainr {#rmd-basics}
+
+### About
+To easily replicate the analysis performed in this project, I have compiled an R package called `marktwainr` so that anybody can easily use and play with the selected works of Mark Twain.  To install this package, follow the code below.
+
+```{r, eval=FALSE}
+devtools::install_github("oliviaxu17/marktwainr")
+library(marktwainr)
+```
+

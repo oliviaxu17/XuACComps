@@ -1,3 +1,2 @@
-The preface pretty much says it all.  \par
 
-Second paragraph of abstract starts here.
+Mark Twain is one of the most notable writers in American history.  After Andrew and I completed our project using the texts of Katherine Mansfield, I knew I wanted to do something similar with a much larger and more complicated body of work.  Mark Twain was an easy choice; he has written many famous works.  Through sentiment analysis and stylometric analysis, I was able to see content and style changes in just one body of work, as well as across works over the span of his lifetime.  I also included a short introduction to LDA in this project because it is a different way to analyze text, and it was something that Andrew and I had not done before.  Lastly, to make this project easily replicable, I put the text files in a package called `marktwainr` so that other students can readily access them and play with them.  

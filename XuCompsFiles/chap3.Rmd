@@ -36,7 +36,6 @@ if(!require(reedtemplates)){
   devtools::install_github("ismayc/reedtemplates")
   }
 library(reedtemplates)
-flights <- read.csv("data/flights.csv")
 ```
 
 
@@ -45,7 +44,7 @@ flights <- read.csv("data/flights.csv")
 ### What is LDA?
 LDA is a statistical model used to detect underlying groups that would explain why some parts of the data look similar.  It is commonly used to identify patterns that are not easily interpretable.  In this chapter, I will be outlining how I applied the LDA method on Twain's works.  As a resource and for inspiration, I used the "Data Until I Die!" blog post on topic modeling called "A Rather Nosy Topic Model Analysis of the Enron Email Corpus".
 
-#### Twain and LDA
+### Twain and LDA
 Because LDA is used to find patterns and meaning in a large amount of documents, I needed to break up my Twain documents in a logical fashion so that I could have more than six documents (from the original six books).  I decided to break each book up by chapters, which seemed like the best way to break the stories up into smaller increments but still have them make sense and be complete in themselves.  I ended up with somewhere close to 300 chapters after I run my code.  
 
 The first thing the blog did was to create a string with stop words.  A stop word is a word that we're not interested in looking at, so it gets thrown out in the process of finding the natural groupings.  Using the blog post's stop words list as an inspiration, I added my own words to the list.  I kept going back and forth between the output and the stop words list to add words that I didn't want in the output (mostly every day words that didn't tell me much about the topics). 
@@ -105,12 +104,24 @@ topic1 <- twaincorpus[[72]]
 topic1$content[1:10]
 ```
 
+```{r fig.width=2, fig.height=4,echo=FALSE}
+library(png)
+library(grid)
+img <- readPNG("huckfinn35.png")
+grid.raster(img)
+```
+
 This is one of the final chapters from \textit{The Adventures of Huckleberry Finn}.  This chapter describes the scene where Tom and Huck are planning their escape.  There is a lot of arguing going on because the boys are pressed for time and need a plan quick.  Topic 1 very loosely captures the essence of this chapter.
 
 ```{r, echo = FALSE, eval = FALSE}
 sample(which(df.twain.topics$"2" > .95), 10)
 topic2 <- twaincorpus[[10]]
 topic2$content[1:10]
+```
+
+```{r fig.width=2, fig.height=4,echo=FALSE}
+img <- readPNG("connyankee.png")
+grid.raster(img)
 ```
 
 This is a chapter from \textit{A Connecticut Yankee in King Arthur's Court}.  Here, an imprisoned man states that a king could go unrecognized in the streets if wearing peasant's clothing.  The king tests it out and finds that it is indeed true.  There is a lot of dialogue and inner stream of consciousness in this chapter, which again, is very loosely captured by Topic 2.
@@ -121,12 +132,22 @@ topic3 <- twaincorpus[[208]]
 topic3$content[1:10]
 ```
 
+```{r fig.width=2, fig.height=4,echo=FALSE}
+img <- readPNG("roughing.png")
+grid.raster(img)
+```
+
 This excerpt is from \textit{Roughing It}.  This chapter describes a journey by mule, and they are currently somewhere in Nevada.  Topic 3 perfectly sums up this chapter, as it is full of flowery descriptions of nature and the natural world around them.
 
 ```{r, echo = FALSE, eval = FALSE}
 sample(which(df.twain.topics$"4" > .95), 10)
 topic4 <- twaincorpus[[132]]
 topic4$content[1:10]
+```
+
+```{r fig.width=2, fig.height=4,echo=FALSE}
+img <- readPNG("innocents.png")
+grid.raster(img)
 ```
 
 This is a chapter taken from \textit{Innocents Abroad}.  In this chapter, Twain wonders about Jesus's life as a boy because they are at Nazareth, Jesus's boyhood home.  Topic 4 also succintly describes the essence of this chapter. 

@@ -134,7 +134,7 @@ tomSentences <- extract_sentences(tomsawyertext)
 tomsenlen <- sentlen(tomSentences)
 ```
 
-```{r, echo = FALSE, cache=TRUE, fig.align="center"}
+```{r, echo = FALSE, cache=TRUE, fig.align="center", fig.height=3, fig.width=4}
 data <- as.data.frame(cbind(tomsenlen, c(1:length(tomsenlen))))
 ggplot(data, aes(x = V2, y = tomsenlen)) + geom_smooth() + 
   geom_hline(yintercept = mean(data$tomsenlen), color = "red", linetype = "dashed") + ylab("Sentence Length") + xlab("Sentence number") + ggtitle("Sentence Length across Tom Sawyer")
@@ -157,7 +157,7 @@ tokenlen <- function(token) {
 tokenlength <- tokenlen(tomToken)
 ```
 
-```{r, echo = FALSE, cache = TRUE, fig.align="center"}
+```{r, echo = FALSE, cache = TRUE, fig.align="center", fig.height=3, fig.width=4}
 data <- as.data.frame(cbind(tokenlength, c(1:length(tokenlength))))
 ggplot(data, aes(x = V2, y = tokenlength)) + geom_smooth() + 
   geom_hline(yintercept = mean(data$tokenlength), color = "red", linetype = "dashed") + ylab("Token Length") + xlab("Token number") + ggtitle("Token Length across Tom Sawyer")

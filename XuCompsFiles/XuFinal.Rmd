@@ -1,7 +1,7 @@
 ---
 author: 'Olivia Xu'
 date: 'February 27, 2017'
-division: 'Amherst College'
+division: 'Statistics Department'
 advisor: 'Advisor N. Horton'
 department: 'Department of Statistics'
 title: 'Statistical Text Mining with the works of Mark Twain: An Introduction to Latent Dirichlet Allocation Method'
@@ -11,11 +11,9 @@ abstract: >
 # like below, use a command like that for the abstract above.  Note that a tab is 
 # needed on the line after the >.
 acknowledgements: >
-  I want to thank a few people.
+  I want to thank the Statistics Department of Amherst College, especially my advisor, Professor Nicholas Horton, for all that they have done for me.  Through Nick's faith in my ability, I've become more a more confident and capable student and person. 
 dedication: >
-  You can have a dedication here if you wish. 
-preface: >
-  This is an example of a thesis setup to use the reed thesis document class.
+  To my parents. 
 bibliography: bib/thesis.bib
 # Download your specific bibliography database file and refer to it in the line above.
 csl: csl/apa.csl
@@ -82,6 +80,9 @@ Immediately below is the chunk for Chapter 2.
 
 
 ```{r chapter3, child = 'chap3.Rmd'}
+```
+
+```{r chapter4, child = 'chap4.Rmd'}
 ```
 
 <!--

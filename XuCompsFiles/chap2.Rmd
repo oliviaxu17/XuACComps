@@ -31,7 +31,12 @@ Now that I've gone through \textit{The Adventures of Tom Sawyer}, I wanted to ta
 
 Twain led a very exciting and inventive life.  When he was young, his family moved to the city of Hannibal, MO.  Hannibal was a frequent stop for steam boats, and it came to be quite the inspiration for Twain later in his works.  Twain was educated at a local private school until he droppped out to become a printer's apprentice, where he discovered his love for writing.  Later in his life, while living in California, Twain met his future wife, Olivia Langdon.  They had one son and three daughters together, only of which one of them would make it to adulthood.  Twain frequently invested in new inventions, and towards the end of his career, he was broke from poor investments.  Below is a timeline of Twain's life in picture format.  
 
-!["Timeline of Twain's Life"](twaintimeline.png) 
+```{r fig.width=1, fig.height=4,echo=FALSE}
+library(png)
+library(grid)
+img <- readPNG("twaintimeline.png")
+grid.raster(img)
+```
 
 ### Twain's life as seen through his works
 
@@ -264,5 +269,77 @@ As expected, milestones in Twain's life match up with the sentiment throughout h
 
 #### Stylometric Analysis
 
+```{r}
+library(katherinemansfieldr)
+# sentence length
+sentlen <- function(sentences) {
+  senlen <- 0
+  for (i in 1:length(sentences)) {
+    sentlen <- sapply(gregexpr("\\W+", sentences[i]), length) + 1
+    senlen <- c(senlen, sentlen)
+  }
+  senlen <- senlen[-1]
+  return(senlen)
+}
+
+earlySent <- extract_sentences(early)
+earlysenlen <- sentlen(earlySent)
+earlysendata <- as.data.frame(cbind(earlysenlen, c(1:length(earlysenlen))))
+
+middleSent <- extract_sentences(middle)
+middlesenlen <- sentlen(middleSent)
+middlesendata <- as.data.frame(cbind(middlesenlen, c(1:length(middlesenlen))))
+
+lateSent <- extract_sentences(late)
+latesenlen <- sentlen(lateSent)
+latesendata <- as.data.frame(cbind(latesenlen, c(1:length(latesenlen))))
+```
+
+
+```{r}
+library(ggplot2)
+# early sentence length
+earlysenlenplot <- ggplot(earlysendata, 
+                    aes(x = V2, y = earlysenlen)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(earlysendata$earlysenlen), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Sentence Length \n (# of words)") + 
+  xlab("Line Number") +
+  ggtitle("Average Sentence Length \n for Early Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r}
+# middle sentence length
+middlesenlenplot <- ggplot(middlesendata, 
+                    aes(x = V2, y = middlesenlen)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(middlesendata$middlesenlen), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Sentence Length \n (# of words)") + 
+  xlab("Line Number") +
+  ggtitle("Average Sentence Length \n for Middle Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
+
+```{r}
+# late sentence length
+latesenlenplot <- ggplot(latesendata, 
+                    aes(x = V2, y = latesenlen)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(latesendata$latesenlen), 
+             colour = "red", linetype = "dotted") +
+  ylab("Average Sentence Length \n (# of words)") + 
+  xlab("Line Number") +
+  ggtitle("Average Sentence Length \n for Late Stories") + 
+  theme(axis.title.y = element_text(size = 9)) + 
+  theme(axis.title.x = element_text(size = 9)) + 
+  theme(plot.title = element_text(size = 12))
+```
 
 
