@@ -1,17 +1,7 @@
 ---
-header-includes:
-- \usepackage{amssymb,amsthm,amsmath}
-- \usepackage{chemarr}
 output: 
-  pdf_documentt:
-    fig_height: 3
-    fig_width: 5
-  pdf_document:
-    fig_height: 3
-    fig_width: 5
-  word_document:
-    fig_height: 3
-    fig_width: 5
+  pdf_document: 
+    latex_engine: xelatex
 ---
 
 <!--
@@ -255,7 +245,7 @@ allworkssenttrans <- as.numeric(get_transformed_values(allworkssent,
 allworksdata <- data.frame(cbind(linenumber = seq_along(allworkssenttrans), ft = allworkssenttrans))
 ```
 
-```{r, fig.align="center", cache=TRUE, warning=FALSE}
+```{r, fig.align="center", cache=TRUE, warning=FALSE, echo = FALSE}
 ggplot(data = allworksdata, aes(x = linenumber, y = ft)) +
         geom_bar(stat = "identity", alpha = 0.8, color = "midnightblue", fill = "midnightblue") +
         theme_minimal() +
@@ -273,5 +263,6 @@ ggplot(data = allworksdata, aes(x = linenumber, y = ft)) +
 As expected, milestones in Twain's life match up with the sentiment throughout his works.  Appropriately, the sentiment reaches an all time high around the time he meets his wife, Olivia, and gets married.  The sentiment plummets after the death of their first child and never quite recovers to the original happiness.  The works end on a sad note when half his children have died and he's bankrupt.  
 
 #### Stylometric Analysis
+
 
 

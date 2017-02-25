@@ -3,6 +3,17 @@ header-includes:
 - \usepackage{graphicx,latexsym}
 - \usepackage{amssymb,amsthm,amsmath}
 - \usepackage{longtable,booktabs,setspace}
+output:
+  pdf_document:
+    fig_height: 3
+    fig_width: 5
+    latex_engine: xelatex
+  html_document:
+    fig_height: 3
+    fig_width: 5
+  word_document:
+    fig_height: 3
+    fig_width: 5
 ---
 
 <!--
@@ -29,147 +40,97 @@ flights <- read.csv("data/flights.csv")
 ```
 
 
-# Tables, Graphics, References, and Labels {#ref_labels}
+# Latent Dirichlet Allocation: An Expository Review {#ref_labels}
 
-## Tables
+### What is LDA?
+LDA is a statistical model used to detect underlying groups that would explain why some parts of the data look similar.  It is commonly used to identify patterns that are not easily interpretable.  In this chapter, I will be outlining how I applied the LDA method on Twain's works.  As a resource and for inspiration, I used the "Data Until I Die!" blog post on topic modeling called "A Rather Nosy Topic Model Analysis of the Enron Email Corpus".
 
-In addition to the tables that can be automatically generated from a data frame in **R** that you saw in [R Markdown Basics] using the `kable` function, you can also create tables using _pandoc_. (More information is available at <http://pandoc.org/README.html#tables>.)  This might be useful if you don't have values specifically stored in **R**, but you'd like to display them in table form.  Below is an example.  Pay careful attention to the alignment in the table and hyphens to create the rows and columns.
+#### Twain and LDA
+Because LDA is used to find patterns and meaning in a large amount of documents, I needed to break up my Twain documents in a logical fashion so that I could have more than six documents (from the original six books).  I decided to break each book up by chapters, which seemed like the best way to break the stories up into smaller increments but still have them make sense and be complete in themselves.  I ended up with somewhere close to 300 chapters after I run my code.  
 
-----------------------------------------------------------------------------------
-  Factors                    Correlation between Parents & Child      Inherited
-------------------------- ----------------------------------------- --------------
-  Education                                -0.49                         Yes
-  
-  Socio-Economic Status                     0.28                        Slight   
-  
-  Income                                    0.08                          No
-  
-  Family Size                               0.18                        Slight
-  
-  Occupational Prestige                     0.21                        Slight
-------------------------- ----------------------------------------- --------------
-Table: Correlation of Inheritance Factors for Parents and Child \label{tab:inher}
+The first thing the blog did was to create a string with stop words.  A stop word is a word that we're not interested in looking at, so it gets thrown out in the process of finding the natural groupings.  Using the blog post's stop words list as an inspiration, I added my own words to the list.  I kept going back and forth between the output and the stop words list to add words that I didn't want in the output (mostly every day words that didn't tell me much about the topics). 
 
-We can also create a link to the table by doing the following: `r ref("inher", type = "table")`.  If you go back to [Loading and exploring data] and look at the `kable` function code, you'll see that I added in a similar `\\label` to be able to reference that table later.  (The extra backslash there is a way that _Markdown_ interfaces with \LaTeX\.) We can create a reference to the max delays table: `r ref("max_delay", type = "table")`.
-
-The addition of the `\label{}` option to the end of the table caption allows us to then use the \LaTeX\ `autoref` function to produce the link. The `ref` function in **R** allows for tables and figures to be referenced in the document easily without having to directly use the `autoref` function.  It will automatically add "Table" before your number if you add the "tab:" prefix to your label. Note that this reference could appear anywhere throughout the document.  
-
-<!-- We will next explore ways to create this label-ref link using figures. -->
-
-\clearpage
-
-<!-- clearpage ends the page, and also dumps out all floats.
-  Floats are things like tables and figures. -->
-
-
-## Figures
-
-If your thesis has a lot of figures, _R Markdown_ might behave better for you than that other word processor.  One perk is that it will automatically number the figures accordingly in each chapter.    You'll also be able to create a label for each figure, add a caption, and then reference the figure in a way similar to what we saw with tables earlier.  If you label your figures, you can move the figures around and _R Markdown_ will automatically adjust the numbering for you.  No need for you to remember!  So that you don't have to get too far into \LaTeX\ to do this, a couple **R** functions have been created for you to assist.  You'll see their use below.
-
-<!--
-One thing that may be annoying is the way _R Markdown_ handles "floats" like tables and figures (it's really \LaTeX's fault). \LaTeX\ will try to find the best place to put your object based on the text around it and until you're really, truly done writing you should just leave it where it lies. There are some optional arguments specified in the options parameter of the `label` function.  If you need to shift your figure around, it might be good to look here on tweaking the options argument:  <https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions>
-
-If you need a graphic or tabular material to be part of the text, you can just put it inline. If you need it to appear in the list of figures or tables, it should be placed in a code chunk.
--->
-
-
-In the **R** chunk below, we will load in a picture stored as `reed.jpg` in our main directory.  We then give it the caption of "Reed logo", the label of "reed", and specify that this is a figure.  Note again the use of the `results = "asis"` specification to automatically include and compile the \LaTeX\ code.
-
-```{r reed_logo, results = "asis"}
-label(path = "figure/reed.jpg", caption = "Reed logo", 
-      label = "reed", type = "figure")
+```{r, include = FALSE}
+library(stringr)
+library(plyr)
+library(tm)
+library(tm.plugin.mail)
+library(SnowballC)
+library(topicmodels)
 ```
 
-Here is a reference to the Reed logo: `r ref("reed")`.  Note the use of the inline **R** code here.  By default "figure" is specified as the type.  For clarity, we could have also added the `label` and `type` to the parameter specifications and this would give us the same result: `r ref(label = "reed", type = "figure")`.
+```{r, include = FALSE}
+twaincorpus <- Corpus(DirSource("/home/class17/sxu17/XuACComps/TwainTexts"))
 
-\clearpage 
-
-<!-- starts a new page and stops trying to place floats such as tables and figures -->
-
-Below we will investigate how to save the output of an **R** plot and label it in a way similar to that done above.  Recall the `flights` dataset from [](#rmd-basics).  (Note that we've shown a different way to reference a section or chapter here.)  We will next explore a bar graph with the mean flight departure delays by airline from Portland for 2014.  Note also the use of the `scale` parameter which is discussed on the next page.
-
-```{r boxplot, warnings = FALSE, messages = FALSE}
-delay_airline <- flights %>% group_by(carrier) %>%
-  summarize(mean_dep_delay = mean(dep_delay)) %>%
-  ggplot(aes(x = carrier, y = mean_dep_delay)) +
-  geom_bar(position = "identity", stat = "identity", fill = "red")
-ggsave("figure/delays.pdf", plot = delay_airline,
-  height = 3, width = 6)
+extendedstopwords=c("a","about","above","across","after","MIME Version","forwarded","again","against","all","almost","alone","along","already","also","although","always","am","among","an","and","another","any","anybody","anyone","anything","anywhere","are","area","areas","aren't","around","as","ask","asked","asking","asks","at","away","b","back","backed","backing","backs","be","became","because","become","becomes","been","before","began","behind","being","beings","below","best","better","between","big","both","but","by","c","came","can","cannot","can't","case","cases","certain","certainly","clear","clearly","come","could","couldn't","d","did","didn't","differ","different","differently","do","does","doesn't","doing","done","don't","down","downed","downing","downs","during","e","each","early","either","end","ended","ending","ends","enough","even","evenly","ever","every","everybody","everyone","everything","everywhere","f","face","faces","fact","facts","far","felt","few","find","finds","first","for","four","from","full","fully","further","furthered","furthering","furthers","g","gave","general","generally","get","gets","give","given","gives","go","going","good","goods","got","great","greater","greatest","group","grouped","grouping","groups","h","had","hadn't","has","hasn't","have","haven't","having","he","he'd","he'll","her","here","here's","hers","herself","he's","high","higher","highest","him","himself","his","how","however","how's","i","i'd","if","i'll","i'm","important","in","interest","interested","interesting","interests","into","is","isn't","it","its","it's","itself","i've","j","just","k","keep","keeps","kind","knew","know","known","knows","l","large","largely","last","later","latest","least","less","let","lets","let's","like","likely","long","longer","longest","m","made","make","making","man","many","may","me","member","members","men","might","more","most","mostly","mr","mrs","much","must","mustn't","my","myself","n","necessary","need","needed","needing","needs","never","new","newer","newest","next","no","nobody","non","noone","nor","not","nothing","now","nowhere","number","numbers","o","of","off","often","old","older","oldest","on","once","one","only","open","opened","opening","opens","or","order","ordered","ordering","orders","other","others","ought","our","ours","ourselves","out","over","own","p","part","parted","parting","parts","per","perhaps","place","places","point","pointed","pointing","points","possible","present","presented","presenting","presents","problem","problems","put","puts","q","quite","r","rather","really","right","room","rooms","s","said","same","saw","say","says","second","seconds","see","seem","seemed","seeming","seems","sees","several","shall","shan't","she","she'd","she'll","she's","should","shouldn't","show","showed","showing","shows","side","sides","since","small","smaller","smallest","so","some","somebody","someone","something","somewhere","state","states","still","such","sure","t","take","taken","than","that","that's","the","their","theirs","them","themselves","then","there","therefore","there's","these","they","they'd","they'll","they're","they've","thing","things","think","thinks","this","those","though","thought","thoughts","three","through","thus","to","today","together","too","took","toward","turn","turned","turning","turns","two","u","under","until","up","upon","us","use","used","uses","v","very","w","want","wanted","wanting","wants","was","wasn't","way","ways","we","we'd","well","we'll","wells","went","were","we're","weren't","we've","what","what's","when","when's","where","where's","whether","which","while","who","whole","whom","who's","whose","why","why's","will","with","within","without","won't","work","worked","working","works","would","wouldn't","x","y","year","years","yes","yet","you","you'd","you'll","young","younger","youngest","your","you're","yours","yourself","yourselves","you've","z", "littl", "tom", "warnt", "hundr", "look", "nigger", "aint", "dont", "peopl", "chapter", "wilson", "didnt", "wouldnt", "couldnt", "peopl", "beauti", "pictur", "reckon", "time")
 ```
 
-```{r box_label, results = "asis"}
-label(path = "figure/delays.pdf", 
-      caption = "Mean Delays by Airline", 
-      label = "delays", type = "figure")
+Next, I had to clean up the Corpus.  A Corpus is just a collection of text files, in this case, it is the collection of all the individual chapters from the six books.  I did this by making all the text lower case (`tolower` parameter, ensures that "Twain" doesn't show up as something from "twain"), removing punctuation (`removePunctuation` parameter), removing numbers (`removeNumbers` parameter), removing stop words (`stopwords` parameter), removing stemming (`stemming`, which reduces words of the same root to the same thing, ie "dog", "dog-like", "puppy" are all the same thing), and looking at words of three characters or more (`wordLengths`).  The last parameter, `weighting`, indicates that we are going to weight the importance of words by the standard term frequency (`tf`) method.    
+
+```{r}
+dtm.control = list(
+  tolower = T,
+  removePunctuation = T,
+  removeNumbers = T,
+  stopwords = c(stopwords("english"),extendedstopwords),
+  stemming = T,
+  wordLengths = c(3,Inf),
+  weighting = weightTf)
+
+dtm = DocumentTermMatrix(twaincorpus, control=dtm.control)
+dtm = removeSparseTerms(dtm,0.999)
+dtm = dtm[rowSums(as.matrix(dtm))>0,]
 ```
 
-A table linking these carrier codes to airline names is available at <https://github.com/ismayc/pnwflights14/blob/master/data/airlines.csv>.
+After cleaning the Corpus, we're ready to find our topics.  The last step is to decide how many topics we want `R` to find.  For this example, I decided to use 4 categories (k=4).  I went back and forth between this output and the extended stop words list to add necessary words I didn't want included in the topics.    
 
-\clearpage
-
-Next, we will explore the use of the `scale` parameter which can be used to shrink or expand an image.  Here we use the mathematical graph stored in the "subdivision.pdf" file.  Note that we didn't specify the `caption =` or `label =` here, but we could have.
-
-```{r subdiv1, results = "asis"}
-label("figure/subdivision.pdf", "Subdiv. graph", "subd", 
-      scale = 0.75)
+```{r}
+k = 4
+lda.model = LDA(dtm, k)
+terms(lda.model,20)
 ```
 
-Here is a reference to this image: `r ref("subd")`.  (Move this around throughout the document as you wish.)
+Topic 1 looks like it is related to time of day and relationships with other people.  Topic 2 looks like it has to do with time of day again and speaking.  The third topic has to do with nature and the outdoors.  Lastly, topic 4 looks like it has to do with noblemen and religion.  To see what these topics look like in context, let's look at some randomly selected chapters that scored highly in each category.
 
-#### More Figure Stuff
-
-Lastly, we will explore how to rotate figures using the `angle` parameter.
-
-```{r subdiv1_180, results = "asis"}
-label("figure/subdivision.pdf", 
-      "A Larger Figure, Flipped Upside Down", 
-      scale = 1.5,
-      angle = 180,
-      label = "subd2")
+```{r, include=FALSE}
+twain.topics = posterior(lda.model, dtm)$topics
+df.twain.topics = as.data.frame(twain.topics)
+df.twain.topics = cbind(email=as.character(rownames(df.twain.topics)), 
+                         df.twain.topics, stringsAsFactors=F)
 ```
 
-As another example, here is a reference to this figure: `r ref("subd2", type = "figure")`.  
-
-#### Common Modifications
-
-The following figure features the more popular changes thesis students want to make to their figures. We can add math to the caption that displays below the picture, specify the size of our caption to display below the figure (list of sizes available at this [link](http://www.emerson.emory.edu/services/latex/latex_169.html#SEC169)), and also specify that a different caption `alt.cap` be what appears in the Table of Figures for this figure.
-
-If you'd like to make further tweaks to figures, you might need to invoke some \LaTeX\ code.  Please email us at <data@reed.edu> if you need assistance.
-
-```{r tinymathcap, results = "asis"}
-label("figure/subdivision.pdf", 
-      caption = "Subdivision of arc segments",
-      alt.cap = "You can see that $p_3 = p_6^\\prime$",
-      cap.size = "footnotesize",
-      label = "subd3")
+```{r, echo = FALSE, eval=FALSE}
+sample(which(df.twain.topics$"1" > .95), 10)
+topic1 <- twaincorpus[[72]]
+topic1$content[1:10]
 ```
 
-<!-- Note here that you need to have two backslashes before LaTeX commands such as prime -->
+This is one of the final chapters from \textit{The Adventures of Huckleberry Finn}.  This chapter describes the scene where Tom and Huck are planning their escape.  There is a lot of arguing going on because the boys are pressed for time and need a plan quick.  Topic 1 very loosely captures the essence of this chapter.
 
-## Footnotes and Endnotes
+```{r, echo = FALSE, eval = FALSE}
+sample(which(df.twain.topics$"2" > .95), 10)
+topic2 <- twaincorpus[[10]]
+topic2$content[1:10]
+```
 
-You might want to footnote something. ^[footnote text] The footnote will be in a smaller font and placed appropriately. Endnotes work in much the same way. More information can be found about both on the CUS site or feel free to reach out to <data@reed.edu>.
+This is a chapter from \textit{A Connecticut Yankee in King Arthur's Court}.  Here, an imprisoned man states that a king could go unrecognized in the streets if wearing peasant's clothing.  The king tests it out and finds that it is indeed true.  There is a lot of dialogue and inner stream of consciousness in this chapter, which again, is very loosely captured by Topic 2.
 
-## Bibliographies
+```{r, echo = FALSE, eval = FALSE}
+sample(which(df.twain.topics$"3" > .95), 10)
+topic3 <- twaincorpus[[208]]
+topic3$content[1:10]
+```
 
-Of course you will need to cite things, and you will probably accumulate an armful of sources. There are a variety of tools available for creating a bibliography database (stored with the .bib extension).  In addition to BibTeX suggested below, you may want to consider using the free and easy-to-use tool called Zotero.  The Reed librarians have created Zotero documentation at <http://libguides.reed.edu/citation/zotero>.  In addition, a tutorial is available from Middlebury College at <http://sites.middlebury.edu/zoteromiddlebury/>.
+This excerpt is from \textit{Roughing It}.  This chapter describes a journey by mule, and they are currently somewhere in Nevada.  Topic 3 perfectly sums up this chapter, as it is full of flowery descriptions of nature and the natural world around them.
 
-_R Markdown_ uses _pandoc_ (<http://pandoc.org/>) to build its bibliographies.  One nice caveat of this is that you won't have to do a second compile to load in references as standard \LaTeX\ requires. To cite references in your thesis (after creating your bibliography database), place the reference name inside square brackets and precede it by the "at" symbol.  For example, here's a reference to a book about worrying:  [@Molina1994].  This `Molina1994` entry appears in a file called `thesis.bib` in the `bib` folder.  This bibliography database file was created by a program called BibTeX.  You can call this file something else if you like (look at the YAML header in the main .Rmd file) and, by default, is to placed in the `bib` folder.  
+```{r, echo = FALSE, eval = FALSE}
+sample(which(df.twain.topics$"4" > .95), 10)
+topic4 <- twaincorpus[[132]]
+topic4$content[1:10]
+```
 
-For more information about BibTeX and bibliographies, see our CUS site (<http://web.reed.edu/cis/help/latex/index.html>)^[@reedweb2007]. There are three pages on this topic:  _bibtex_ (which talks about using BibTeX, at <http://web.reed.edu/cis/help/latex/bibtex.html>), _bibtexstyles_ (about how to find and use the bibliography style that best suits your needs, at <http://web.reed.edu/cis/help/latex/bibtexstyles.html>) and _bibman_ (which covers how to make and maintain a bibliography by hand, without BibTeX, at <http://web.reed.edu/cis/help/latex/bibman.html>). The last page will not be useful unless you have only a few sources.
+This is a chapter taken from \textit{Innocents Abroad}.  In this chapter, Twain wonders about Jesus's life as a boy because they are at Nazareth, Jesus's boyhood home.  Topic 4 also succintly describes the essence of this chapter. 
 
-If you look at the YAML header at the top of the main .Rmd file you can see that we can specify the style of the bibliography by referencing the appropriate csl file.  You can download a variety of different style files at <https://www.zotero.org/styles>.  Make sure to download the file into the csl folder.
 
-##### Tips for Bibliographies
 
-- Like with thesis formatting, the sooner you start compiling your bibliography for something as large as thesis, the better. Typing in source after source is mind-numbing enough; do you really want to do it for hours on end in late April? Think of it as procrastination.
-- The cite key (a citation's label) needs to be unique from the other entries.
-- When you have more than one author or editor, you need to separate each author's name by the word "and" e.g. `Author = {Noble, Sam and Youngberg, Jessica},`.
-- Bibliographies made using BibTeX (whether manually or using a manager) accept \LaTeX\ markup, so you can italicize and add symbols as necessary.
-- To force capitalization in an article title or where all lowercase is generally used, bracket the capital letter in curly braces.
-- You can add a Reed Thesis citation^[@noble2002] option. The best way to do this is to use the phdthesis type of citation, and use the optional "type" field to enter "Reed thesis" or "Undergraduate thesis." 
-
-## Anything else?
-
-If you'd like to see examples of other things in this template, please contact the Data @ Reed team (email <data@reed.edu>) with your suggestions. We love to see people using _R Markdown_ for their theses, and are happy to help.
 

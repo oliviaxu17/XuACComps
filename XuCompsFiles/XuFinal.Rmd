@@ -80,6 +80,7 @@ Immediately below is the chunk for Chapter 2.
 ```{r chapter2, child = 'chap2.Rmd'}
 ```
 
+
 ```{r chapter3, child = 'chap3.Rmd'}
 ```
 
@@ -96,4 +97,3 @@ The bib chunk below must go last in this document according to how R Markdown re
 
 ```{r bib, child = 'bibliography.Rmd'}
 ```
-
