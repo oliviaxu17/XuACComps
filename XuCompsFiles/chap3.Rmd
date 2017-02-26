@@ -104,7 +104,9 @@ topic1 <- twaincorpus[[72]]
 topic1$content[1:10]
 ```
 
-```{r, fig.width=2, fig.height=4,echo=FALSE}
+> 
+
+```{r, fig.width=4, fig.height=4,echo=FALSE, fig.align="center"}
 library(png)
 library(grid)
 img <- readPNG("huckfinn35.png")
@@ -113,18 +115,22 @@ grid.raster(img)
 
 This is one of the final chapters from \textit{The Adventures of Huckleberry Finn}.  This chapter describes the scene where Tom and Huck are planning their escape.  There is a lot of arguing going on because the boys are pressed for time and need a plan quick.  Topic 1 very loosely captures the essence of this chapter.
 
+> 
+
 ```{r, echo = FALSE, eval = FALSE}
 sample(which(df.twain.topics$"2" > .95), 10)
 topic2 <- twaincorpus[[10]]
 topic2$content[1:10]
 ```
 
-```{r, fig.width=2, fig.height=4,echo=FALSE}
+```{r, fig.width=4, fig.height=4,echo=FALSE, fig.align = "center"}
 img <- readPNG("connyankee.png")
 grid.raster(img)
 ```
 
 This is a chapter from \textit{A Connecticut Yankee in King Arthur's Court}.  Here, an imprisoned man states that a king could go unrecognized in the streets if wearing peasant's clothing.  The king tests it out and finds that it is indeed true.  There is a lot of dialogue and inner stream of consciousness in this chapter, which again, is very loosely captured by Topic 2.
+
+> 
 
 ```{r, echo = FALSE, eval = FALSE}
 sample(which(df.twain.topics$"3" > .95), 10)
@@ -132,7 +138,7 @@ topic3 <- twaincorpus[[208]]
 topic3$content[1:10]
 ```
 
-```{r, fig.width=2, fig.height=4,echo=FALSE}
+```{r, fig.width=4, fig.height=4,echo=FALSE, fig.align='center'}
 img <- readPNG("roughing.png")
 grid.raster(img)
 ```
@@ -145,7 +151,9 @@ topic4 <- twaincorpus[[132]]
 topic4$content[1:10]
 ```
 
-```{r, fig.width=2, fig.height=4,echo=FALSE}
+> 
+
+```{r, fig.width=4, fig.height=4,echo=FALSE, fig.align="center"}
 img <- readPNG("innocents.png")
 grid.raster(img)
 ```

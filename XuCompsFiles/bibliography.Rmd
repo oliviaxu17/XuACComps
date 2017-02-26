@@ -1,5 +1,7 @@
 ---
-output: pdf_document
+output: 
+  pdf_document: 
+    latex_engine: xelatex
 ---
 
 \backmatter
@@ -30,6 +32,5 @@ This is just for testing with more citations for the bibliography at the end.  A
 -->
 
 ---
-nocite: | 
-  @angel2000, @angel2001, @angel2002a
+
 ...

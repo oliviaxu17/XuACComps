@@ -7,7 +7,7 @@ output:
 # marktwainr {#rmd-basics}
 
 ### About
-To easily replicate the analysis performed in this project, I have compiled an R package called `marktwainr` so that anybody can easily use and play with the selected works of Mark Twain.  To install this package, follow the code below.
+To easily replicate the analysis performed in this project, I have created an R package called `marktwainr` so that anybody can easily use and play with the selected works of Mark Twain.  To install this package, follow the code below.
 
 ```{r, eval=FALSE}
 devtools::install_github("oliviaxu17/marktwainr")

@@ -4,7 +4,7 @@ date: 'February 27, 2017'
 division: 'Statistics Department'
 advisor: 'Advisor N. Horton'
 department: 'Department of Statistics'
-title: 'Statistical Text Mining with the works of Mark Twain: An Introduction to Latent Dirichlet Allocation Method'
+title: 'Statistical Text Mining with the works of Mark Twain: An Introduction to the Latent Dirichlet Allocation Method'
 abstract: >
   `r paste(readLines('abstract.Rmd'), collapse = ' ')`
 # If you'd rather include the preliminary content in files instead of inline

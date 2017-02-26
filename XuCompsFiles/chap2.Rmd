@@ -31,7 +31,7 @@ Now that I've gone through \textit{The Adventures of Tom Sawyer}, I wanted to ta
 
 Twain led a very exciting and inventive life.  When he was young, his family moved to the city of Hannibal, MO.  Hannibal was a frequent stop for steam boats, and it came to be quite the inspiration for Twain later in his works.  Twain was educated at a local private school until he droppped out to become a printer's apprentice, where he discovered his love for writing.  Later in his life, while living in California, Twain met his future wife, Olivia Langdon.  They had one son and three daughters together, only of which one of them would make it to adulthood.  Twain frequently invested in new inventions, and towards the end of his career, he was broke from poor investments.  Below is a timeline of Twain's life in picture format.  
 
-```{r, fig.width=6, fig.height=3,echo=FALSE}
+```{r, fig.width=8, fig.height=4,echo=FALSE}
 library(png)
 library(grid)
 img <- readPNG("twaintimeline.png")
@@ -306,9 +306,9 @@ earlysenlenplot <- ggplot(earlysendata,
   ylab("Average Sentence Length \n (# of words)") + 
   xlab("Line Number") +
   ggtitle("Average Sentence Length \n for Early Stories") + 
-  theme(axis.title.y = element_text(size = 9)) + 
-  theme(axis.title.x = element_text(size = 9)) + 
-  theme(plot.title = element_text(size = 12))
+  theme(axis.title.y = element_text(size = 10)) + 
+  theme(axis.title.x = element_text(size = 7)) + 
+  theme(plot.title = element_text(size = 7))
 ```
 
 ```{r, include=FALSE}
@@ -321,9 +321,9 @@ middlesenlenplot <- ggplot(middlesendata,
   ylab("Average Sentence Length \n (# of words)") + 
   xlab("Line Number") +
   ggtitle("Average Sentence Length \n for Middle Stories") + 
-  theme(axis.title.y = element_text(size = 9)) + 
-  theme(axis.title.x = element_text(size = 9)) + 
-  theme(plot.title = element_text(size = 12))
+  theme(axis.title.y = element_text(size = 10)) + 
+  theme(axis.title.x = element_text(size = 7)) + 
+  theme(plot.title = element_text(size = 7))
 ```
 
 ```{r, include = FALSE}
@@ -336,9 +336,9 @@ latesenlenplot <- ggplot(latesendata,
   ylab("Average Sentence Length \n (# of words)") + 
   xlab("Line Number") +
   ggtitle("Average Sentence Length \n for Late Stories") + 
-  theme(axis.title.y = element_text(size = 9)) + 
-  theme(axis.title.x = element_text(size = 9)) + 
-  theme(plot.title = element_text(size = 12))
+  theme(axis.title.y = element_text(size = 10)) + 
+  theme(axis.title.x = element_text(size = 7)) + 
+  theme(plot.title = element_text(size = 7))
 ```
 
 ```{r, include=FALSE}
@@ -376,9 +376,9 @@ earlytokenplot <- ggplot(earlytokendata,
   ylab("Average Token Length \n (# of characters)") + 
   xlab("Line Number") +
   ggtitle("Average Token Length \n for Early Stories") + 
-  theme(axis.title.y = element_text(size = 9)) + 
-  theme(axis.title.x = element_text(size = 9)) + 
-  theme(plot.title = element_text(size = 12))
+  theme(axis.title.y = element_text(size = 10)) + 
+  theme(axis.title.x = element_text(size = 7)) + 
+  theme(plot.title = element_text(size = 7))
 ```
 
 ```{r, include = FALSE}
@@ -391,9 +391,9 @@ middletokenplot <- ggplot(middletokendata,
   ylab("Average Token Length \n (# of characters)") + 
   xlab("Line Number") +
   ggtitle("Average Token Length \n for Middle Stories") + 
-  theme(axis.title.y = element_text(size = 9)) + 
-  theme(axis.title.x = element_text(size = 9)) + 
-  theme(plot.title = element_text(size = 12))
+  theme(axis.title.y = element_text(size = 10)) + 
+  theme(axis.title.x = element_text(size = 7)) + 
+  theme(plot.title = element_text(size = 7))
 ```
 
 ```{r, include= FALSE}
@@ -406,9 +406,9 @@ latetokenplot <- ggplot(latetokendata,
   ylab("Average Token Length \n (# of characters)") + 
   xlab("Line Number") +
   ggtitle("Average Token Length \n for Late Stories") + 
-  theme(axis.title.y = element_text(size = 9)) + 
-  theme(axis.title.x = element_text(size = 9)) + 
-  theme(plot.title = element_text(size = 12))
+  theme(axis.title.y = element_text(size = 10)) + 
+  theme(axis.title.x = element_text(size = 7)) + 
+  theme(plot.title = element_text(size = 7))
 ```
 
 ```{r, include = FALSE}
@@ -423,9 +423,9 @@ earlyquoteplot <- ggplot(earlypunc,
   ylab("Average Number of\n Speaking Lines") + 
   xlab("Line Number") +
   ggtitle("Average Number of Speaking\n Lines for Early Stories") + 
-  theme(axis.title.y = element_text(size = 9)) + 
-  theme(axis.title.x = element_text(size = 9)) + 
-  theme(plot.title = element_text(size = 12))
+  theme(axis.title.y = element_text(size = 10)) + 
+  theme(axis.title.x = element_text(size = 7)) + 
+  theme(plot.title = element_text(size = 7))
 ```
 
 ```{r, include = FALSE}
@@ -440,9 +440,9 @@ middlequoteplot <- ggplot(middlepunc,
   ylab("Average Number of\n Speaking Lines") + 
   xlab("Line Number") +
   ggtitle("Average Number of Speaking\n Lines for Middle Stories") + 
-  theme(axis.title.y = element_text(size = 9)) + 
-  theme(axis.title.x = element_text(size = 9)) + 
-  theme(plot.title = element_text(size = 12))
+  theme(axis.title.y = element_text(size = 10)) + 
+  theme(axis.title.x = element_text(size = 7)) + 
+  theme(plot.title = element_text(size = 7))
 ```
 
 ```{r, include = FALSE}
@@ -457,9 +457,9 @@ latequoteplot <- ggplot(latepunc,
   ylab("Average Number of\n Speaking Lines") + 
   xlab("Line Number") +
   ggtitle("Average Number of Speaking\n Lines for Late Stories") + 
-  theme(axis.title.y = element_text(size = 9)) + 
-  theme(axis.title.x = element_text(size = 9)) + 
-  theme(plot.title = element_text(size = 12))
+  theme(axis.title.y = element_text(size = 10)) + 
+  theme(axis.title.x = element_text(size = 7)) + 
+  theme(plot.title = element_text(size = 7))
 ```
 
 As we can see from the plots below, general trends between early, middle, and late works do not seem to differ drastically.  One difference to note among sentence length is that Twain's earlier works seem to have longer sentences in general, which isn't surprising because his earlier works described landscapes and nature scenery.  His later works had a larger variety in sentence length, which could be due to becoming a more critical and experienced writer over the years.  
@@ -468,7 +468,7 @@ There are more speaking lines in the middle works than early or late works.  Aga
 Because there were only two works used for each period, this analysis is of course limited because I didn't analyze Twain's full body of work for each period.  However, I did pick his most notable pieces to analyze, so these graphs could be able to say something about the general essence of his writing from those periods.  
 
 
-```{r, echo = FALSE, warning=FALSE}
+```{r, include = FALSE, warning=FALSE, fig.height=7, fig.width=8, fig.align="center"}
 library(cowplot)
 library(ggplot2)
 plot_grid(earlysenlenplot, middlesenlenplot, latesenlenplot, 

@@ -9,8 +9,6 @@ Mark Twain wrote a full body of works that are an excellent source of data for s
 
 \appendix
 
-# Appendix
-
 ## Chapter 1
 
 ### Sentiment Analysis 
@@ -68,24 +66,27 @@ tomsenttrans <- as.numeric(get_transformed_values(tomsent,
                                   low_pass_size = 3,
                                   scale_vals = TRUE,
                                   scale_range = FALSE))
-tomsentdata <- data.frame(cbind(linenumber = seq_along(tomsenttrans), ft = tomsenttrans))
+tomsentdata <- data.frame(cbind(linenumber = seq_along(tomsenttrans), 
+                                ft = tomsenttrans))
 ```
 
 ```{r, eval = FALSE}
 # tom sawyer sentiment graph with Fourier transform
 ggplot(data = tomsentdata, aes(x = linenumber, y = ft)) +
-        geom_bar(stat = "identity", alpha = 0.8, color = "midnightblue", fill = "midnightblue") +
+        geom_bar(stat = "identity", alpha = 0.8, 
+        color = "midnightblue", fill = "midnightblue") +
         theme_minimal() +
         ylab("Transformed Sentiment Value") +
-        ggtitle(expression(paste("Sentiment in ", italic("The Adventures of Tom Sawyer")))) +
+        ggtitle(expression(paste("Sentiment in ", 
+        italic("The Adventures of Tom Sawyer")))) +
         theme(axis.title.x=element_blank()) +
         theme(axis.ticks.x=element_blank()) +
         theme(axis.text.x=element_blank()) +
-ggplot2::annotate("text", size = 3, x = c(8, 18, 22, 38, 71, 85), 
-                 y = c(2.3, -1.3, 1.5, .9, 1.1, -1.1), 
-                 label = c("Meets Amy Lawrence", "Falls in love\n with Becky",
-                           "Witness graveyard\n murder", "Escape to island",
-                           "Trial of Potter and Injun Joe", "Huck saves widow")) +
+        ggplot2::annotate("text", size = 3, x = c(8, 18, 22, 38, 71, 85), 
+        y = c(2.3, -1.3, 1.5, .9, 1.1, -1.1), 
+        label = c("Meets Amy Lawrence", "Falls in love\n with Becky",
+                  "Witness graveyard\n murder", "Escape to island",
+                  "Trial of Potter and Injun Joe", "Huck saves widow")) +
         ggplot2::annotate("segment", arrow = arrow(length = unit(0.03, "npc")),
                  x = c(8, 18, 22, 38, 71, 87), xend = c(8, 18, 22, 38, 71, 87),
                  y = c(2.2, -1, 1.2, .8, 1, -1), 
@@ -120,7 +121,9 @@ tomsenlen <- sentlen(tomSentences)
 # plotting tom sawyer sentence length
 data <- as.data.frame(cbind(tomsenlen, c(1:length(tomsenlen))))
 ggplot(data, aes(x = V2, y = tomsenlen)) + geom_smooth() + 
-  geom_hline(yintercept = mean(data$tomsenlen), color = "red", linetype = "dashed") + ylab("Sentence Length") + xlab("Sentence number") + ggtitle("Sentence Length across Tom Sawyer")
+  geom_hline(yintercept = mean(data$tomsenlen), 
+  color = "red", linetype = "dashed") + ylab("Sentence Length") + 
+  xlab("Sentence number") + ggtitle("Sentence Length across Tom Sawyer")
 ```
 
 ```{r, eval= FALSE}
@@ -143,8 +146,12 @@ tokenlength <- tokenlen(tomToken)
 ```{r, eval=FALSE}
 # plotting token length in tom sawyer
 data <- as.data.frame(cbind(tokenlength, c(1:length(tokenlength))))
-ggplot(data, aes(x = V2, y = tokenlength)) + geom_smooth() + 
-  geom_hline(yintercept = mean(data$tokenlength), color = "red", linetype = "dashed") + ylab("Token Length") + xlab("Token number") + ggtitle("Token Length across Tom Sawyer")
+ggplot(data, aes(x = V2, y = tokenlength)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = mean(data$tokenlength), 
+  color = "red", linetype = "dashed") + 
+  ylab("Token Length") + xlab("Token number") + 
+  ggtitle("Token Length across Tom Sawyer")
 ```
 
 ## Chapter 2
@@ -199,7 +206,8 @@ findstart <- function(text){
     }
   }
   for (j in 50:length(text)){
-    if (text[j] == "End of Project Gutenberg’s Roughing It, by Mark Twain (Samuel Clemens)") {
+    if (text[j] == "End of Project Gutenberg’s Roughing It, 
+        by Mark Twain (Samuel Clemens)") {
       startend <- c(startend, j)
       return(startend)
     }
@@ -226,7 +234,8 @@ findstart <- function(text){
     }
   }
   for (j in 50:length(text)){
-    if (text[j] == "End of the Project Gutenberg EBook of The Innocents Abroad") {
+    if (text[j] == "End of the Project Gutenberg 
+        EBook of The Innocents Abroad") {
       startend <- c(startend, j)
       return(startend)
     }
@@ -281,7 +290,8 @@ findstart <- function(text){
     }
   }
   for (j in 50:length(text)){
-    if (text[j] == "End of the Project Gutenberg EBook of Adventures of Huckleberry Finn,") {
+    if (text[j] == "End of the Project Gutenberg 
+        EBook of Adventures of Huckleberry Finn,") {
       startend <- c(startend, j)
       return(startend)
     }
@@ -308,7 +318,8 @@ findstart <- function(text){
     }
   }
   for (j in 50:length(text)){
-    if (text[j] == "End of the Project Gutenberg EBook of A Connecticut Yankee in King Arthur’s") {
+    if (text[j] == "End of the Project Gutenberg 
+        EBook of A Connecticut Yankee in King Arthur’s") {
       startend <- c(startend, j)
       return(startend)
     }
@@ -367,23 +378,31 @@ allworkssenttrans <- as.numeric(get_transformed_values(allworkssent,
                                   low_pass_size = 3,
                                   scale_vals = TRUE,
                                   scale_range = FALSE))
-allworksdata <- data.frame(cbind(linenumber = seq_along(allworkssenttrans), ft = allworkssenttrans))
+allworksdata <- data.frame(cbind(linenumber = seq_along(allworkssenttrans), 
+                                 ft = allworkssenttrans))
 ```
 
 ```{r, eval = FALSE}
 # sentiment across all works with Fourier transform
 ggplot(data = allworksdata, aes(x = linenumber, y = ft)) +
-        geom_bar(stat = "identity", alpha = 0.8, color = "midnightblue", fill = "midnightblue") +
+        geom_bar(stat = "identity", alpha = 0.8, 
+        color = "midnightblue", fill = "midnightblue") +
         theme_minimal() +
         ylab("Transformed Sentiment Value") +
         ggtitle(expression(paste("Sentiment in Twain's works "))) +
         theme(axis.title.x=element_blank()) +
         theme(axis.ticks.x=element_blank()) +
         theme(axis.text.x=element_blank()) +
-  ggplot2::annotate("text", size = 3, x = c(20, 50, 80, 35, 55, 77, 90), 
-                 y = c(-2, -2, -2, -1, 1, 1.2, -1),
-                 label = c("Early works", "Middle works", "Late works", "Marriage", "Death of son", "Founded publishing\n company", "Bankruptcy")) + 
-  ggplot2::annotate("segment", arrow = arrow(length = unit(0.03, "npc")),x = c(35, 55, 77, 90), xend = c(35, 55, 77, 90),y = c(-.9, .9, 1, -.9),yend = c(-.1, .1, .2, -.1))
+        ggplot2::annotate("text", size = 3, 
+        x = c(20, 50, 80, 35, 55, 77, 90), 
+        y = c(-2, -2, -2, -1, 1, 1.2, -1),
+        label = c("Early works", "Middle works", "Late works", 
+                  "Marriage", "Death of son", 
+                  "Founded publishing\n company", "Bankruptcy")) + 
+        ggplot2::annotate("segment", 
+        arrow = arrow(length = unit(0.03, "npc")),
+        x = c(35, 55, 77, 90), xend = c(35, 55, 77, 90),
+        y = c(-.9, .9, 1, -.9),yend = c(-.1, .1, .2, -.1))
 ```
 
 #### Stylometric Analysis
@@ -405,15 +424,18 @@ sentlen <- function(sentences) {
 # finding sentence length in early, middle, late works
 earlySent <- extract_sentences(early)
 earlysenlen <- sentlen(earlySent)
-earlysendata <- as.data.frame(cbind(earlysenlen, c(1:length(earlysenlen))))
+earlysendata <- 
+  as.data.frame(cbind(earlysenlen, c(1:length(earlysenlen))))
 
 middleSent <- extract_sentences(middle)
 middlesenlen <- sentlen(middleSent)
-middlesendata <- as.data.frame(cbind(middlesenlen, c(1:length(middlesenlen))))
+middlesendata <- 
+  as.data.frame(cbind(middlesenlen, c(1:length(middlesenlen))))
 
 lateSent <- extract_sentences(late)
 latesenlen <- sentlen(lateSent)
-latesendata <- as.data.frame(cbind(latesenlen, c(1:length(latesenlen))))
+latesendata <- 
+  as.data.frame(cbind(latesenlen, c(1:length(latesenlen))))
 ```
 
 ```{r, eval = FALSE}
@@ -478,15 +500,18 @@ tokenlen <- function(token) {
 # token length in early, middle, late works
 earlyToken <- extract_token(early)
 earlytokenlength <- tokenlen(earlyToken)
-earlytokendata <- as.data.frame(cbind(earlytokenlength, c(1:length(earlytokenlength))))
+earlytokendata <- 
+  as.data.frame(cbind(earlytokenlength, c(1:length(earlytokenlength))))
 
 middleToken <- extract_token(middle)
 middletokenlength <- tokenlen(middleToken)
-middletokendata <- as.data.frame(cbind(middletokenlength, c(1:length(middletokenlength))))
+middletokendata <- 
+  as.data.frame(cbind(middletokenlength, c(1:length(middletokenlength))))
 
 lateToken <- extract_token(late)
 latetokenlength <- tokenlen(lateToken)
-latetokendata <- as.data.frame(cbind(latetokenlength, c(1:length(latetokenlength))))
+latetokendata <- 
+  as.data.frame(cbind(latetokenlength, c(1:length(latetokenlength))))
 ```
 
 ```{r, eval = FALSE}
@@ -612,10 +637,77 @@ library(topicmodels)
 
 ```{r, eval = FALSE}
 # creating Corpus of Twain texts
-twaincorpus <- Corpus(DirSource("/home/class17/sxu17/XuACComps/TwainTexts"))
+twaincorpus <- 
+  Corpus(DirSource("/home/class17/sxu17/XuACComps/TwainTexts"))
 
 # stop words list
-extendedstopwords=c("a","about","above","across","after","MIME Version","forwarded","again","against","all","almost","alone","along","already","also","although","always","am","among","an","and","another","any","anybody","anyone","anything","anywhere","are","area","areas","aren't","around","as","ask","asked","asking","asks","at","away","b","back","backed","backing","backs","be","became","because","become","becomes","been","before","began","behind","being","beings","below","best","better","between","big","both","but","by","c","came","can","cannot","can't","case","cases","certain","certainly","clear","clearly","come","could","couldn't","d","did","didn't","differ","different","differently","do","does","doesn't","doing","done","don't","down","downed","downing","downs","during","e","each","early","either","end","ended","ending","ends","enough","even","evenly","ever","every","everybody","everyone","everything","everywhere","f","face","faces","fact","facts","far","felt","few","find","finds","first","for","four","from","full","fully","further","furthered","furthering","furthers","g","gave","general","generally","get","gets","give","given","gives","go","going","good","goods","got","great","greater","greatest","group","grouped","grouping","groups","h","had","hadn't","has","hasn't","have","haven't","having","he","he'd","he'll","her","here","here's","hers","herself","he's","high","higher","highest","him","himself","his","how","however","how's","i","i'd","if","i'll","i'm","important","in","interest","interested","interesting","interests","into","is","isn't","it","its","it's","itself","i've","j","just","k","keep","keeps","kind","knew","know","known","knows","l","large","largely","last","later","latest","least","less","let","lets","let's","like","likely","long","longer","longest","m","made","make","making","man","many","may","me","member","members","men","might","more","most","mostly","mr","mrs","much","must","mustn't","my","myself","n","necessary","need","needed","needing","needs","never","new","newer","newest","next","no","nobody","non","noone","nor","not","nothing","now","nowhere","number","numbers","o","of","off","often","old","older","oldest","on","once","one","only","open","opened","opening","opens","or","order","ordered","ordering","orders","other","others","ought","our","ours","ourselves","out","over","own","p","part","parted","parting","parts","per","perhaps","place","places","point","pointed","pointing","points","possible","present","presented","presenting","presents","problem","problems","put","puts","q","quite","r","rather","really","right","room","rooms","s","said","same","saw","say","says","second","seconds","see","seem","seemed","seeming","seems","sees","several","shall","shan't","she","she'd","she'll","she's","should","shouldn't","show","showed","showing","shows","side","sides","since","small","smaller","smallest","so","some","somebody","someone","something","somewhere","state","states","still","such","sure","t","take","taken","than","that","that's","the","their","theirs","them","themselves","then","there","therefore","there's","these","they","they'd","they'll","they're","they've","thing","things","think","thinks","this","those","though","thought","thoughts","three","through","thus","to","today","together","too","took","toward","turn","turned","turning","turns","two","u","under","until","up","upon","us","use","used","uses","v","very","w","want","wanted","wanting","wants","was","wasn't","way","ways","we","we'd","well","we'll","wells","went","were","we're","weren't","we've","what","what's","when","when's","where","where's","whether","which","while","who","whole","whom","who's","whose","why","why's","will","with","within","without","won't","work","worked","working","works","would","wouldn't","x","y","year","years","yes","yet","you","you'd","you'll","young","younger","youngest","your","you're","yours","yourself","yourselves","you've","z", "littl", "tom", "warnt", "hundr", "look", "nigger", "aint", "dont", "peopl", "chapter", "wilson", "didnt", "wouldnt", "couldnt", "peopl", "beauti", "pictur", "reckon", "time")
+extendedstopwords=c("a","about","above","across","after",
+  "forwarded","again","against","all","almost","alone",
+  "along","already","also","although","always","am",
+  "among","an","and","another","any","anybody","anyone",
+  "anything","anywhere","are","area","areas","aren't",
+  "around","as","ask","asked","asking","asks","at","away",
+  "b","back","backed","backing","backs","be","became",
+  "because","become","becomes","been","before","began",
+  "behind","being","beings","below","best","better",
+  "between","big","both","but","by","c","came","can",
+  "cannot","can't","case","cases","certain","certainly",
+  "clear","clearly","come","could","couldn't","d","did",
+  "didn't","differ","different","differently","do","does",
+  "doesn't","doing","done","don't","down","downed","downing",
+  "downs","during","e","each","early","either","end","ended",
+  "ending","ends","enough","even","evenly","ever","every",
+  "everybody","everyone","everything","everywhere","f",
+  "face","faces","fact","facts","far","felt","few","find",
+  "finds","first","for","four","from","full","fully","further"
+  ,"furthered","furthering","furthers","g","gave","general",
+  "generally","get","gets","give","given","gives","go","going"
+  ,"good","goods","got","great","greater","greatest","group",
+  "grouped","grouping","groups","h","had","hadn't","has",
+  "hasn't","have","haven't","having","he","he'd","he'll","her",
+  "here","here's","hers","herself","he's","high","higher",
+  "highest","him","himself","his","how","however","how's","i",
+  "i'd","if","i'll","i'm","important","in","interest",
+  "interested","interesting","interests","into","is","isn't",
+  "it","its","it's","itself","i've","j","just","k","keep",
+  "keeps","kind","knew","know","known","knows","l","large",
+  "largely","last","later","latest","least","less","let",
+  "lets","let's","like","likely","long","longer","longest",
+  "m","made","make","making","man","many","may","me","member",
+  "members","men","might","more","most","mostly","mr","mrs",
+  "much","must","mustn't","my","myself","n","necessary","need",
+  "needed","needing","needs","never","new","newer","newest",
+  "next","no","nobody","non","noone","nor","not","nothing",
+  "now","nowhere","number","numbers","o","of","off","often",
+  "old","older","oldest","on","once","one","only","open",
+  "opened","opening","opens","or","order","ordered","ordering",
+  "orders","other","others","ought","our","ours","ourselves",
+  "out","over","own","p","part","parted","parting","parts","per",
+  "perhaps","place","places","point","pointed","pointing","points",
+  "possible","present","presented","presenting","presents","problem",
+  "problems","put","puts","q","quite","r","rather","really","right",
+  "room","rooms","s","said","same","saw","say","says","second","seconds",
+  "see","seem","seemed","seeming","seems","sees","several","shall",
+  "shan't","she","she'd","she'll","she's","should","shouldn't","show",
+  "showed","showing","shows","side","sides","since","small","smaller",
+  "smallest","so","some","somebody","someone","something","somewhere",
+  "state","states","still","such","sure","t","take","taken","than",
+  "that","that's","the","their","theirs","them","themselves","then",
+  "there","therefore","there's","these","they","they'd","they'll",
+  "they're","they've","thing","things","think","thinks","this","those",
+  "though","thought","thoughts","three","through","thus","to","today",
+  "together","too","took","toward","turn","turned","turning","turns",
+  "two","u","under","until","up","upon","us","use","used","uses","v",
+  "very","w","want","wanted","wanting","wants","was","wasn't","way",
+  "ways","we","we'd","well","we'll","wells","went","were","we're",
+  "weren't","we've","what","what's","when","when's","where","where's",
+  "whether","which","while","who","whole","whom","who's","whose","why",
+  "why's","will","with","within","without","won't","work","worked","working",
+  "works","would","wouldn't","x","y","year","years","yes","yet","you",
+  "you'd","you'll","young","younger","youngest","your","you're","yours",
+  "yourself","yourselves","you've","z", "littl", "tom", "warnt", "hundr", 
+  "look", "nigger", "aint", "dont", "peopl", "chapter", "wilson", "didnt",
+  "wouldnt", "couldnt", "peopl", "beauti", "pictur", "reckon", "time")
 ```
 
 ```{r, eval = FALSE}
@@ -703,7 +795,7 @@ img <- readPNG("innocents.png")
 grid.raster(img)
 ```
 
-# Chapter 4
+## Chapter 4
 
 ### About
 
